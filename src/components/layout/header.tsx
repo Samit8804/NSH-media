@@ -68,14 +68,8 @@ export default function Header() {
         )}
       >
         <div className="container-site flex items-center justify-between">
-          <Link href="/" className="group flex items-center gap-1">
-            <span className="font-heading text-xl font-bold tracking-tight text-white">
-              NSH
-            </span>
-            <span className="text-primary text-xl font-bold">.</span>
-            <span className="font-heading text-xl font-bold tracking-tight text-white">
-              MEDIA
-            </span>
+          <Link href="/" className="flex items-center gap-2">
+            <img src="/images/logo.png" alt="NSH Media" className="h-10 w-auto" />
           </Link>
 
           <nav className="hidden items-center gap-1 lg:flex">
