@@ -1,0 +1,344 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  EDITOR
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  PROPOSAL_SENT
+  WON
+  LOST
+  ARCHIVED
+}
+
+enum ProjectStatus {
+  DISCOVERY
+  DESIGN
+  DEVELOPMENT
+  TESTING
+  REVIEW
+  COMPLETED
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+  PDF
+  LOGO
+}
+
+enum InvoiceStatus {
+  PENDING
+  PAID
+  OVERDUE
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  role          UserRole  @default(EDITOR)
+  accounts      Account[]
+  sessions      Session[]
+  clients       Client[]
+  messages      Message[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Service {
+  id             String   @id @default(cuid())
+  title          String
+  slug           String   @unique
+  description    String   @db.Text
+  icon           String
+  benefits       String[]
+  features       String[]
+  process        Json?
+  faqs           Json?
+  image          String?
+  price          String   @default("Custom")
+  published      Boolean  @default(true)
+  seoTitle       String?
+  seoDescription String?
+  seoKeywords    String?
+  canonicalUrl   String?
+  ogImage        String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Project {
+  id             String   @id @default(cuid())
+  title          String
+  slug           String   @unique
+  description    String   @db.Text
+  client         String
+  industry       String
+  overview       String?  @db.Text
+  challenge      String?  @db.Text
+  solution       String?  @db.Text
+  technologies   String[]
+  images         String[]
+  thumbnail      String?
+  liveUrl        String?
+  githubUrl      String?
+  results        String[]
+  testimonial    Json?
+  category       String
+  featured       Boolean  @default(false)
+  displayOrder   Int      @default(0)
+  published      Boolean  @default(true)
+  seoTitle       String?
+  seoDescription String?
+  seoKeywords    String?
+  canonicalUrl   String?
+  ogImage        String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model BlogPost {
+  id             String   @id @default(cuid())
+  title          String
+  slug           String   @unique
+  excerpt        String   @db.Text
+  content        String   @db.Text
+  author         String
+  authorImage    String?
+  featuredImage  String
+  categories     String[]
+  tags           String[]
+  published      Boolean  @default(false)
+  featured       Boolean  @default(false)
+  seoTitle       String?
+  seoDescription String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Testimonial {
+  id        String   @id @default(cuid())
+  name      String
+  company   String
+  role      String?
+  photo     String?
+  content   String   @db.Text
+  rating    Int      @default(5)
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model Lead {
+  id        String     @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  service   String?
+  budget    String?
+  message   String     @db.Text
+  status    LeadStatus @default(NEW)
+  notes     String     @default("")
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model TeamMember {
+  id        String   @id @default(cuid())
+  name      String
+  position  String
+  bio       String?  @db.Text
+  image     String?
+  linkedin  String?
+  twitter   String?
+  createdAt DateTime @default(now())
+}
+
+model Pricing {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  price       Int
+  description String?  @db.Text
+  features    String[]
+  highlighted Boolean  @default(false)
+  popular     Boolean  @default(false)
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+}
+
+model FAQ {
+  id        String   @id @default(cuid())
+  question  String   @db.Text
+  answer    String   @db.Text
+  category  String   @default("General")
+  order     Int      @default(0)
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model Analytics {
+  id        String   @id @default(cuid())
+  date      DateTime @unique
+  visitors  Int      @default(0)
+  pageViews Int      @default(0)
+  leads     Int      @default(0)
+  sales     Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+model Media {
+  id        String    @id @default(cuid())
+  name      String
+  url       String
+  type      MediaType
+  size      Int?
+  createdAt DateTime  @default(now())
+}
+
+model Client {
+  id        String          @id @default(cuid())
+  name      String
+  email     String          @unique
+  company   String?
+  userId    String          @unique
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projects  ClientProject[]
+  invoices  Invoice[]
+  createdAt DateTime        @default(now())
+}
+
+model ClientProject {
+  id          String        @id @default(cuid())
+  title       String
+  description String?       @db.Text
+  status      ProjectStatus @default(DISCOVERY)
+  progress    Int           @default(0)
+  startDate   DateTime
+  deadline    DateTime?
+  clientId    String
+  client      Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  documents   Document[]
+  createdAt   DateTime      @default(now())
+}
+
+model Document {
+  id              String        @id @default(cuid())
+  name            String
+  url             String
+  type            String
+  clientProjectId String?
+  clientProject   ClientProject? @relation(fields: [clientProjectId], references: [id], onDelete: Cascade)
+  uploadedAt      DateTime      @default(now())
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  sender    String
+  content   String   @db.Text
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model Invoice {
+  id        String        @id @default(cuid())
+  clientId  String
+  client    Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  amount    Int
+  status    InvoiceStatus @default(PENDING)
+  dueDate   DateTime
+  items     Json?
+  createdAt DateTime      @default(now())
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  content   String   @db.Text
+  postId    String
+  approved  Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model SiteSettings {
+  id              String  @id @default(cuid())
+  siteName        String  @default("NSH Media")
+  siteDescription String? @db.Text
+  logoUrl         String?
+  faviconUrl      String?
+  googleAnalytics String?
+  contactEmail    String?
+  linkedin        String?
+  twitter         String?
+  github          String?
+  youtube         String?
+  officeAddress   String?
+  officePhone     String?
+  primaryColor    String  @default("#2563EB")
+  secondaryColor  String  @default("#0F172A")
+  accentColor     String  @default("#F59E0B")
+  darkMode        Boolean @default(false)
+}
+
+model Revenue {
+  id        String   @id @default(cuid())
+  title     String
+  amount    Float
+  category  String   @default("General")
+  date      DateTime @default(now())
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
