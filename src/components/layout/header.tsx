@@ -69,7 +69,7 @@ export default function Header() {
       >
         <div className="container-site flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <img src="/images/logo.png" alt="NSH Media" className="h-10 w-auto" />
+            <img src="/images/logo.png" alt="NSH Media" className="h-10 w-10 rounded-full object-cover ring-2 ring-white/10" />
           </Link>
 
           <nav className="hidden items-center gap-1 lg:flex">
