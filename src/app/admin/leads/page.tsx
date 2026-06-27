@@ -40,18 +40,36 @@ const initialLeads: Lead[] = [
   { id: 7, name: "Anna Martinez", email: "anna@example.com", service: "Mobile App", budget: "$25,000 - $40,000", status: "Lost", date: "2026-06-15", message: "Fitness tracking app with social features.", notes: "" },
 ]
 
+const months = [
+  { value: "all", label: "All Months" },
+  { value: "01", label: "January" },
+  { value: "02", label: "February" },
+  { value: "03", label: "March" },
+  { value: "04", label: "April" },
+  { value: "05", label: "May" },
+  { value: "06", label: "June" },
+  { value: "07", label: "July" },
+  { value: "08", label: "August" },
+  { value: "09", label: "September" },
+  { value: "10", label: "October" },
+  { value: "11", label: "November" },
+  { value: "12", label: "December" },
+]
+
 export default function LeadsPage() {
   const [leads, setLeads] = useState<Lead[]>(initialLeads)
   const [search, setSearch] = useState("")
   const [activeTab, setActiveTab] = useState("All")
   const [expandedId, setExpandedId] = useState<number | null>(null)
   const [noteInputs, setNoteInputs] = useState<Record<number, string>>({})
+  const [selectedMonth, setSelectedMonth] = useState("all")
 
   const filtered = leads.filter((lead) => {
     const q = search.toLowerCase()
     const matchesSearch = lead.name.toLowerCase().includes(q) || lead.email.toLowerCase().includes(q)
     const matchesTab = activeTab === "All" || lead.status === activeTab
-    return matchesSearch && matchesTab
+    const matchesMonth = selectedMonth === "all" || lead.date.slice(5, 7) === selectedMonth
+    return matchesSearch && matchesTab && matchesMonth
   })
 
   const exportCSV = () => {
@@ -99,6 +117,15 @@ export default function LeadsPage() {
             className="w-full rounded-xl bg-white/[0.04] border border-white/5 pl-9 pr-4 py-2.5 text-sm text-white placeholder:text-silver/40 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/30 transition-all"
           />
         </div>
+        <select
+          value={selectedMonth}
+          onChange={(e) => setSelectedMonth(e.target.value)}
+          className="rounded-xl bg-white/[0.04] border border-white/5 px-3.5 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/30 transition-all"
+        >
+          {months.map((m) => (
+            <option key={m.value} value={m.value} className="bg-[#020617] text-white">{m.label}</option>
+          ))}
+        </select>
       </div>
 
       <div className="flex flex-wrap gap-1.5 p-1 rounded-xl bg-white/[0.02] border border-white/5 w-fit">
