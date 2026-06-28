@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select"
 import { ArrowLeft, X, ImageIcon } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 import MediaPicker from "@/components/admin/MediaPicker"
 
 const allCategories = ["Design", "Development", "SEO", "Marketing", "AI", "Trends", "Accessibility"]
@@ -118,7 +119,7 @@ export default function NewBlogPostPage() {
               <div className="space-y-2">
                 {featuredImage && (
                   <div className="relative w-full h-32 rounded-xl overflow-hidden border border-white/10">
-                    <img src={featuredImage} alt="Preview" className="h-full w-full object-cover" />
+                    <Image src={featuredImage} alt="Preview" fill className="object-cover" />
                     <button onClick={() => setFeaturedImage("")} className="absolute top-2 right-2 p-1 bg-black/50 rounded-full text-white"><X className="h-3 w-3" /></button>
                   </div>
                 )}

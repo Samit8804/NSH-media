@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/select"
 import { ArrowLeft, Upload, X, ImageIcon } from "lucide-react"
 import MediaPicker from "@/components/admin/MediaPicker"
+import Image from "next/image"
 import Link from "next/link"
 
 export default function NewProjectPage() {
@@ -199,8 +200,8 @@ export default function NewProjectPage() {
         </CardHeader>
         <CardContent>
           {imageUrl ? (
-            <div className="relative mb-4">
-              <img src={imageUrl} alt="Featured" className="w-full h-48 object-cover rounded-lg" />
+            <div className="relative mb-4 w-full h-48">
+              <Image src={imageUrl} alt="Featured" fill className="object-cover rounded-lg" />
               <button
                 onClick={() => setImageUrl("")}
                 className="absolute top-2 right-2 p-1 bg-white rounded-full shadow hover:bg-slate-100"

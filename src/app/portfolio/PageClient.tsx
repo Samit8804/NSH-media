@@ -78,7 +78,7 @@ export default function PortfolioPage() {
                       </div>
                       <div className="p-6">
                         <Badge className="mb-3 bg-primary/10 text-primary hover:bg-primary/20">{project.category}</Badge>
-                        <h3 className="mb-1 text-xl font-bold group-hover:text-primary">{project.title}</h3>
+                        <h2 className="mb-1 text-xl font-bold group-hover:text-primary">{project.title}</h2>
                         <p className="mb-4 text-sm text-silver">{project.client}</p>
                         <div className="flex flex-wrap gap-2">
                           {project.technologies.slice(0, 3).map((tech) => (

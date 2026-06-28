@@ -46,7 +46,7 @@ export default function ServicesPage() {
                     <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-[14px] bg-primary/10 text-primary">
                       {IconComponent && <IconComponent className="h-8 w-8" />}
                     </div>
-                    <h3 className="text-card mb-3">{service.title}</h3>
+                    <h2 className="text-card mb-3">{service.title}</h2>
                     <p className="mb-6 leading-relaxed text-silver">{service.description}</p>
                     <Link href={`/services/${service.slug}`} className="inline-flex items-center gap-2 text-sm font-semibold text-primary transition-all hover:gap-3">
                       Learn More <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />

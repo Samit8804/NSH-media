@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
@@ -69,7 +70,7 @@ export default function Header() {
       >
         <div className="container-site flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <img src="/images/logo.png" alt="NSH Media" className="h-10 w-10 rounded-full object-cover ring-2 ring-white/10" />
+            <Image src="/images/logo.png" alt="NSH Media" width={40} height={40} className="h-10 w-10 rounded-full object-cover ring-2 ring-white/10" />
           </Link>
 
           <nav className="hidden items-center gap-1 lg:flex">

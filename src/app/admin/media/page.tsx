@@ -5,6 +5,7 @@ import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { Upload, Search, Trash2, ImageIcon, FileText, Video, Music, Download } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import Image from "next/image"
 import { getMedia, uploadMedia, deleteMediaFromCloudinary } from "@/actions/media"
 
 const typeIcons: Record<string, React.ElementType> = { IMAGE: ImageIcon, VIDEO: Video, PDF: FileText, LOGO: ImageIcon }
@@ -86,9 +87,9 @@ export default function MediaPage() {
           return (
             <motion.div key={item.id} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.03 }} className="group relative">
               <div className="glass-card overflow-hidden">
-                <div className="h-32 flex items-center justify-center bg-white/[0.02]">
+                <div className="relative h-32 flex items-center justify-center bg-white/[0.02]">
                   {item.type === "IMAGE" ? (
-                    <img src={item.url} alt={item.name} className="h-full w-full object-cover" />
+                    <Image src={item.url} alt={item.name} fill className="object-cover" />
                   ) : (
                     <Icon className="h-10 w-10 text-silver/40" />
                   )}

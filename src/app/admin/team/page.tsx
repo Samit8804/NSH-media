@@ -14,6 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import Image from "next/image"
 import MediaPicker from "@/components/admin/MediaPicker"
 
 interface TeamMember {
@@ -159,8 +160,8 @@ export default function TeamPage() {
             <div className="space-y-2">
               <Label className="text-silver">Image URL</Label>
               {form.imageUrl && (
-                <div className="relative inline-block">
-                  <img src={form.imageUrl} alt="Preview" className="w-20 h-20 rounded-xl object-cover" />
+                <div className="relative inline-block w-20 h-20">
+                  <Image src={form.imageUrl} alt="Preview" fill className="object-cover rounded-xl" />
                   <button
                     type="button"
                     onClick={() => setForm({ ...form, imageUrl: "" })}

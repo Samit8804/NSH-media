@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     template: "%s | NSH Media",
   },
   description:
-    "We craft digital experiences that drive growth. From web development to AI automation, we help businesses thrive in the digital landscape.",
+    "NSH Media is a full-service digital agency offering web design, development, SEO, AI automation, branding, and e-commerce solutions that drive business growth.",
   keywords: [
     "web design",
     "web development",
@@ -49,14 +49,14 @@ export const metadata: Metadata = {
     siteName: "NSH Media",
     title: "NSH Media — Building Digital Experiences That Drive Growth",
     description:
-      "We craft digital experiences that drive growth. From web development to AI automation, we help businesses thrive in the digital landscape.",
+      "NSH Media is a full-service digital agency offering web design, development, SEO, AI automation, branding, and e-commerce solutions that drive business growth.",
     images: [{ url: "/og-default.svg", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "NSH Media — Building Digital Experiences That Drive Growth",
     description:
-      "We craft digital experiences that drive growth. From web development to AI automation, we help businesses thrive in the digital landscape.",
+      "NSH Media is a full-service digital agency offering web design, development, SEO, AI automation, branding, and e-commerce solutions that drive business growth.",
     images: ["/og-default.svg"],
   },
   icons: {
@@ -70,7 +70,7 @@ export const metadata: Metadata = {
     follow: true,
   },
   verification: {
-    google: process.env.GOOGLE_SITE_VERIFICATION || "",
+    google: process.env.GOOGLE_SITE_VERIFICATION || "VaPia2I9oiBw9jOwjtyhOgqGaOQ2GxN7rzjB7ZNX1tA",
     yandex: "",
     yahoo: "",
   },

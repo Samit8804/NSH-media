@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { getMedia } from "@/actions/media"
 import { ImageIcon, Search, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import Image from "next/image"
 import { cn } from "@/lib/utils"
 
 interface MediaItem {
@@ -91,7 +92,7 @@ export default function MediaPicker({ open, onClose, onSelect }: MediaPickerProp
                       )}
                     >
                       {item.type === "IMAGE" ? (
-                        <img src={item.url} alt={item.name} className="h-full w-full object-cover" />
+                        <Image src={item.url} alt={item.name} fill className="object-cover" />
                       ) : (
                         <div className="h-full w-full flex items-center justify-center bg-white/[0.04]">
                           <ImageIcon className="h-8 w-8 text-silver/30" />
