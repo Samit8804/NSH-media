@@ -1,9 +1,0 @@
-User-agent: *
-Allow: /
-Disallow: /admin/
-Disallow: /client/
-Disallow: /api/auth/
-Disallow: /api/cron/
-Crawl-delay: 10
-
-Sitemap: https://nshmedia.com/sitemap.xml
