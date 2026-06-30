@@ -70,7 +70,7 @@ export const metadata: Metadata = {
     follow: true,
   },
   verification: {
-    google: process.env.GOOGLE_SITE_VERIFICATION || "VaPia2I9oiBw9jOwjtyhOgqGaOQ2GxN7rzjB7ZNX1tA",
+    google: process.env.GOOGLE_SITE_VERIFICATION || "w0VGkMPKvQsFO_k3ULNFDJShxFck5CU5Cqz6ZTUzb58",
     yandex: "",
     yahoo: "",
   },
