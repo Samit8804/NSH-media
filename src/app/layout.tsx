@@ -60,9 +60,9 @@ export const metadata: Metadata = {
     images: ["/og-default.svg"],
   },
   icons: {
-    icon: "/favicon.svg",
-    shortcut: "/favicon.svg",
-    apple: "/apple-icon.svg",
+    icon: "/images/logo.png",
+    shortcut: "/images/logo.png",
+    apple: "/images/logo.png",
   },
   manifest: "/manifest",
   robots: {
