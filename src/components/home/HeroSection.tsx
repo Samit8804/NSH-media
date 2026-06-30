@@ -70,8 +70,8 @@ export default function HeroSection() {
             </motion.div>
 
             <motion.h1 variants={fadeUp} className="text-hero text-foreground">
-              <span className="block">Building Premium</span>
-              <span className="block">Digital Experiences</span>
+              <span className="block">A Premium Digital Agency</span>
+              <span className="block">Building Digital Experiences</span>
             </motion.h1>
 
             <motion.p variants={fadeUpSmall} className="mt-6 text-lg text-silver max-w-xl leading-relaxed mx-auto lg:mx-0">

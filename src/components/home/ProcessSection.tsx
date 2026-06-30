@@ -7,31 +7,37 @@ const steps = [
     number: "01",
     title: "Discovery",
     description: "We learn about your business, goals, and target audience to define project scope.",
+    detail: "We conduct stakeholder interviews, analyze your competitive landscape, and identify your target audience demographics. This deep research forms the foundation of a strategy aligned with your business objectives.",
   },
   {
     number: "02",
     title: "Strategy",
     description: "We create a detailed roadmap, timeline, and technical strategy for your project.",
+    detail: "We translate research insights into a comprehensive project roadmap with clear milestones, technical architecture decisions, and resource allocation plans that keep every stakeholder aligned on the vision.",
   },
   {
     number: "03",
     title: "Design",
     description: "Our designers craft intuitive interfaces and engaging visual experiences.",
+    detail: "We create wireframes, interactive prototypes, and polished visual designs that balance aesthetic appeal with functional usability. Every design decision is validated through user feedback and stakeholder input.",
   },
   {
     number: "04",
     title: "Development",
     description: "We build your product using modern frameworks and best coding practices.",
+    detail: "We write clean, modular code using modern frameworks and follow industry best practices for performance, accessibility, and security. Regular code reviews and automated testing ensure exceptional quality throughout development.",
   },
   {
     number: "05",
     title: "Testing",
     description: "Rigorous quality assurance ensures everything performs flawlessly.",
+    detail: "Our QA team performs comprehensive testing including functional, performance, cross-browser, and security audits. We identify and resolve issues before launch to guarantee a flawless user experience across all devices.",
   },
   {
     number: "06",
     title: "Launch",
     description: "We deploy your product and provide ongoing support for continued success.",
+    detail: "We orchestrate a carefully planned rollout, monitoring performance and user behavior from day one. Post-launch support, training, and continuous optimization ensure your digital product achieves lasting success.",
   },
 ]
 
@@ -86,6 +92,9 @@ export default function ProcessSection() {
                   <h3 className="text-lg font-heading font-semibold text-foreground mb-2">{step.title}</h3>
                   <p className="text-sm text-silver leading-relaxed max-w-[180px]">
                     {step.description}
+                  </p>
+                  <p className="text-xs text-silver/70 leading-relaxed max-w-[180px] mt-2">
+                    {step.detail}
                   </p>
                 </div>
               </motion.div>

@@ -1,0 +1,31 @@
+# NSH Media — Digital Agency
+
+## About
+NSH Media is a full-service digital agency specializing in web development, UI/UX design, SEO optimization, branding, and AI automation. We build custom digital experiences that drive business growth.
+
+## Services
+- **Web Design & Development**: Custom websites, web applications, and e-commerce platforms built with Next.js, React, Node.js, and modern frameworks.
+- **UI/UX Design**: User-centered designs focused on conversion optimization, accessibility, and exceptional user experiences.
+- **SEO Optimization**: Data-driven search engine optimization including technical SEO, on-page optimization, content strategy, and link building.
+- **Branding**: Complete brand identity packages including logo design, typography, color systems, and brand guidelines.
+- **AI Automation**: Intelligent automation solutions for workflow optimization, chatbots, and business process automation.
+- **Maintenance & Support**: Ongoing website maintenance, security updates, performance monitoring, and technical support.
+
+## Site Architecture
+- Homepage: https://nsh-media.vercel.app/
+- Services: https://nsh-media.vercel.app/services
+- Portfolio: https://nsh-media.vercel.app/portfolio
+- Blog: https://nsh-media.vercel.app/blog
+- Pricing: https://nsh-media.vercel.app/pricing
+- Contact: https://nsh-media.vercel.app/contact
+- FAQ: https://nsh-media.vercel.app/faq
+- About: https://nsh-media.vercel.app/about
+- Careers: https://nsh-media.vercel.app/careers
+- Case Studies: https://nsh-media.vercel.app/case-studies
+
+## Technologies
+Next.js, TypeScript, React, Node.js, Tailwind CSS, Prisma, PostgreSQL, Cloudinary, Framer Motion, Stripe, MongoDB, AWS, GraphQL, Docker, Figma
+
+## Contact
+- Email: hello@nshmedia.com
+- Phone: +1 (555) 123-4567

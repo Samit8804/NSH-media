@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
+import ObfuscatedEmail from "@/components/ui/ObfuscatedEmail"
 
 const fadeInUp = {
   initial: { opacity: 0, y: 40 },
@@ -153,7 +154,7 @@ export default function ContactPage() {
                 {[
                   { icon: MapPin, title: "Our Office", detail: "123 Madison Avenue, Suite 400\nNew York, NY 10016, USA" },
                   { icon: Phone, title: "Phone", detail: "+1 (555) 123-4567" },
-                  { icon: Mail, title: "Email", detail: "hello@nshmedia.com" },
+                  { icon: Mail, title: "Email", detail: <ObfuscatedEmail email="hello@nshmedia.com" /> },
                 ].map((item) => (
                   <div key={item.title} className="glass-card flex items-start gap-4 p-5">
                     <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">

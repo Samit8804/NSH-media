@@ -8,6 +8,7 @@ import { ToastProvider } from "@/providers/toast-provider"
 import LayoutWrapper from "@/components/layout/layout-wrapper"
 import CursorFollower from "@/components/effects/cursor-follower"
 import SchemaOrg from "@/components/seo/SchemaOrg"
+import FacebookPixel from "@/components/seo/FacebookPixel"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -30,7 +31,7 @@ export const metadata: Metadata = {
     template: "%s | NSH Media",
   },
   description:
-    "NSH Media is a full-service digital agency offering web design, development, SEO, AI automation, branding, and e-commerce solutions that drive business growth.",
+    "NSH Media is a premier digital agency for web design, web development, SEO, AI automation, and branding. We build custom solutions that grow your business.",
   keywords: [
     "web design",
     "web development",
@@ -49,14 +50,14 @@ export const metadata: Metadata = {
     siteName: "NSH Media",
     title: "NSH Media — Building Digital Experiences That Drive Growth",
     description:
-      "NSH Media is a full-service digital agency offering web design, development, SEO, AI automation, branding, and e-commerce solutions that drive business growth.",
+      "NSH Media is a premier digital agency for web design, web development, SEO, AI automation, and branding. We build custom solutions that grow your business.",
     images: [{ url: "/og-default.svg", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "NSH Media — Building Digital Experiences That Drive Growth",
     description:
-      "NSH Media is a full-service digital agency offering web design, development, SEO, AI automation, branding, and e-commerce solutions that drive business growth.",
+      "NSH Media is a premier digital agency for web design, web development, SEO, AI automation, and branding. We build custom solutions that grow your business.",
     images: ["/og-default.svg"],
   },
   icons: {
@@ -119,6 +120,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             {`(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src='https://www.clarity.ms/tag/'+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window, document, 'clarity', 'script', '${process.env.NEXT_PUBLIC_CLARITY_ID}');`}
           </Script>
         )}
+        <FacebookPixel />
       </body>
     </html>
   )

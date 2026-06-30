@@ -83,6 +83,27 @@ export default function IndustriesSection() {
             )
           })}
         </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="mt-20 glass-card p-8 md:p-10"
+        >
+          <h2 className="text-section text-gradient font-heading text-center mb-6">Why Choose NSH Media</h2>
+          <div className="max-w-4xl mx-auto space-y-4 text-silver leading-relaxed">
+            <p>
+              NSH Media combines strategic thinking with technical excellence to deliver digital solutions that produce real business outcomes. Unlike typical agencies, we do not just build websites — we engineer growth engines. Every project begins with deep research into your market, audience, and competitive landscape, ensuring our work is rooted in strategy, not assumptions.
+            </p>
+            <p>
+              Our team brings together expertise across web design, web development, SEO, AI automation, and branding, allowing us to tackle complex challenges that single-specialty agencies cannot. We believe in transparent collaboration, delivering regular updates, clear communication, and measurable results at every stage of the project lifecycle.
+            </p>
+            <p>
+              From startups scaling their first product to established enterprises modernizing their digital presence, our client partnerships are built on trust, reliability, and a shared commitment to excellence. Choosing NSH Media means investing in a partnership that prioritizes your growth as much as you do.
+            </p>
+          </div>
+        </motion.div>
       </div>
     </section>
   )

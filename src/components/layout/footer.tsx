@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { Linkedin, Twitter, Github, Youtube, ArrowRight, Mail, Phone, MapPin } from "lucide-react"
+import ObfuscatedEmail from "@/components/ui/ObfuscatedEmail"
 
 const services = [
   { label: "Web Design", href: "/services/web-design" },
@@ -172,7 +173,7 @@ export default function Footer() {
               <div className="mt-8 space-y-4">
                 <div className="flex items-start gap-3 text-sm text-silver">
                   <Mail className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                  <span>contact@nshmedia.com</span>
+                  <ObfuscatedEmail email="contact@nshmedia.com" />
                 </div>
                 <div className="flex items-start gap-3 text-sm text-silver">
                   <Phone className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
