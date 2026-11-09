@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
@@ -20,48 +20,82 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import {
+  getAllProjects,
+  deleteProject,
+  toggleFeatured,
+  togglePublished,
+  updateProject,
+} from "@/actions/portfolio"
 
 interface Project {
-  id: number
+  id: string
   title: string
   category: string
   featured: boolean
   published: boolean
   date: string
+  createdAt?: string
 }
 
-const initialProjects: Project[] = [
-  { id: 1, title: "TechFlow Dashboard", category: "Web App", featured: true, published: true, date: "2026-06-20" },
-  { id: 2, title: "GreenLeaf Branding", category: "Branding", featured: false, published: true, date: "2026-06-18" },
-  { id: 3, title: "FitTrack Mobile", category: "Mobile App", featured: true, published: false, date: "2026-06-15" },
-  { id: 4, title: "UrbanEats Platform", category: "Web App", featured: false, published: true, date: "2026-06-10" },
-  { id: 5, title: "CloudSync Solution", category: "SaaS", featured: false, published: true, date: "2026-06-05" },
-  { id: 6, title: "Artisan Market", category: "E-commerce", featured: true, published: true, date: "2026-05-28" },
-]
-
 export default function PortfolioPage() {
-  const [projects, setProjects] = useState<Project[]>(initialProjects)
+  const [projects, setProjects] = useState<Project[]>([])
   const [search, setSearch] = useState("")
-  const [deleteId, setDeleteId] = useState<number | null>(null)
+  const [deleteId, setDeleteId] = useState<string | null>(null)
   const [editProject, setEditProject] = useState<Project | null>(null)
+
+  useEffect(() => {
+    getAllProjects().then((data) => {
+      const list = (data as unknown as Project[]) || []
+      setProjects(
+        list.map((p) => ({
+          id: p.id,
+          title: p.title,
+          category: p.category,
+          featured: p.featured,
+          published: p.published,
+          date: p.createdAt ? new Date(p.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "",
+        }))
+      )
+    }).catch(() => setProjects([]))
+  }, [])
 
   const filtered = projects.filter((p) =>
     p.title.toLowerCase().includes(search.toLowerCase())
   )
 
-  const toggleFeatured = (id: number) => {
-    setProjects(projects.map((p) => (p.id === id ? { ...p, featured: !p.featured } : p)))
+  const handleToggleFeatured = async (id: string) => {
+    const project = projects.find((p) => p.id === id)
+    if (!project) return
+    const nextFeatured = !project.featured
+    setProjects(projects.map((p) => (p.id === id ? { ...p, featured: nextFeatured } : p)))
+    await toggleFeatured(id, nextFeatured)
   }
 
-  const togglePublished = (id: number) => {
-    setProjects(projects.map((p) => (p.id === id ? { ...p, published: !p.published } : p)))
+  const handleTogglePublished = async (id: string) => {
+    const project = projects.find((p) => p.id === id)
+    if (!project) return
+    const nextPublished = !project.published
+    setProjects(projects.map((p) => (p.id === id ? { ...p, published: nextPublished } : p)))
+    await togglePublished(id, nextPublished)
   }
 
-  const handleDelete = () => {
-    if (deleteId !== null) {
+  const handleDelete = async () => {
+    if (deleteId) {
+      await deleteProject(deleteId)
       setProjects(projects.filter((p) => p.id !== deleteId))
-      setDeleteId(null)
     }
+    setDeleteId(null)
+  }
+
+  const handleUpdate = async () => {
+    if (!editProject) return
+    await updateProject(editProject.id, {
+      title: editProject.title,
+      category: editProject.category,
+    })
+    setProjects(projects.map((p) => (p.id === editProject.id ? editProject : p)))
+    setEditProject(null)
   }
 
   return (
@@ -77,12 +111,12 @@ export default function PortfolioPage() {
             className="w-full rounded-xl border border-white/10 bg-white/[0.04] pl-9 pr-4 py-2 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
-        <Link href="/admin/portfolio/new">
-          <Button>
+        <Button asChild>
+          <Link href="/admin/portfolio/new">
             <Plus className="h-4 w-4 mr-2" />
             Add New Project
-          </Button>
-        </Link>
+          </Link>
+        </Button>
       </div>
 
       <div className="glass-dashboard overflow-hidden">
@@ -111,7 +145,7 @@ export default function PortfolioPage() {
                   <td className="py-3 text-silver">{project.category}</td>
                   <td className="py-3">
                     <button
-                      onClick={() => toggleFeatured(project.id)}
+                      onClick={() => handleToggleFeatured(project.id)}
                       className={cn(
                         "h-6 w-6 rounded border flex items-center justify-center transition-colors",
                         project.featured
@@ -124,7 +158,7 @@ export default function PortfolioPage() {
                   </td>
                   <td className="py-3">
                     <button
-                      onClick={() => togglePublished(project.id)}
+                      onClick={() => handleTogglePublished(project.id)}
                       className={cn(
                         "h-6 w-6 rounded border flex items-center justify-center transition-colors",
                         project.published
@@ -208,9 +242,7 @@ export default function PortfolioPage() {
           )}
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditProject(null)}>Cancel</Button>
-            <Button onClick={() => { setProjects(projects.map((p) => (p.id === editProject?.id ? editProject! : p))); setEditProject(null) }}>
-              Save
-            </Button>
+            <Button onClick={handleUpdate}>Save</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

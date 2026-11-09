@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
 import {
@@ -18,6 +19,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { getDashboardStats } from "@/actions/dashboard"
 import { getRevenueStats } from "@/actions/revenue"
+import { getAllProjects } from "@/actions/portfolio"
 
 type DashboardData = {
   projectCount: number
@@ -36,6 +38,7 @@ type DashboardData = {
 }
 
 export default function AdminDashboard() {
+  const router = useRouter()
   const [data, setData] = useState<DashboardData | null>(null)
   const [revenueStats, setRevenueStats] = useState<{ total: number; entries: number; byDay: Record<string, number> } | null>(null)
 
@@ -43,6 +46,41 @@ export default function AdminDashboard() {
     getDashboardStats().then(setData)
     getRevenueStats().then(setRevenueStats)
   }, [])
+
+  const handleExport = async () => {
+    try {
+      const projects = await getAllProjects()
+      const header = ["Title", "Client", "Industry", "Category", "Featured", "Published", "Live URL"]
+      const rows = [header]
+      projects.forEach((p) =>
+        rows.push([
+          p.title,
+          p.client,
+          p.industry,
+          p.category,
+          p.featured ? "Yes" : "No",
+          p.published ? "Yes" : "No",
+          p.liveUrl ?? "",
+        ])
+      )
+      const csv = rows
+        .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","))
+        .join("\n")
+      const blob = new Blob([csv], { type: "text/csv" })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement("a")
+      link.href = url
+      link.download = "projects.csv"
+      link.click()
+      URL.revokeObjectURL(url)
+    } catch {
+      // ignore export failures
+    }
+  }
+
+  const handleViewAllLeads = () => {
+    router.push("/admin/leads")
+  }
 
   const today = new Date()
   const weekDays = Array.from({ length: 7 }, (_, i) => {
@@ -82,8 +120,10 @@ export default function AdminDashboard() {
           <p className="text-silver mt-1">Here&apos;s what&apos;s happening with your business today.</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="secondary" size="sm"><Upload className="h-4 w-4" /> Export</Button>
-          <Button size="sm"><Plus className="h-4 w-4" /> New Project</Button>
+          <Button variant="secondary" size="sm" onClick={handleExport}><Upload className="h-4 w-4" /> Export</Button>
+          <Button size="sm" onClick={() => router.push("/admin/portfolio/new")}>
+            <Plus className="h-4 w-4 mr-2" /> New Project
+          </Button>
         </div>
       </div>
 
@@ -174,7 +214,7 @@ export default function AdminDashboard() {
             <h3 className="text-sm font-semibold text-white">Recent Leads</h3>
             <p className="text-xs text-silver">Latest inquiries from your site</p>
           </div>
-          <Button variant="ghost" size="sm" className="text-xs">View All</Button>
+          <Button variant="ghost" size="sm" className="text-xs" onClick={handleViewAllLeads}>View All</Button>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">

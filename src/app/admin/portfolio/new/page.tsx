@@ -20,9 +20,12 @@ import { ArrowLeft, Upload, X, ImageIcon } from "lucide-react"
 import MediaPicker from "@/components/admin/MediaPicker"
 import Image from "next/image"
 import Link from "next/link"
+import { createProject } from "@/actions/portfolio"
 
 export default function NewProjectPage() {
   const router = useRouter()
+  const [isSaving, setIsSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
   const [title, setTitle] = useState("")
   const [slug, setSlug] = useState("")
   const [description, setDescription] = useState("")
@@ -37,7 +40,7 @@ export default function NewProjectPage() {
   const [githubUrl, setGithubUrl] = useState("")
   const [category, setCategory] = useState("")
   const [featured, setFeatured] = useState(false)
-  const [published, setPublished] = useState(false)
+  const [published, setPublished] = useState(true)
   const [displayOrder, setDisplayOrder] = useState("0")
   const [showPicker, setShowPicker] = useState(false)
   const [imageUrl, setImageUrl] = useState("")
@@ -56,6 +59,49 @@ export default function NewProjectPage() {
     if (techInput.trim() && !technologies.includes(techInput.trim())) {
       setTechnologies([...technologies, techInput.trim()])
       setTechInput("")
+    }
+  }
+
+  const handleSave = async () => {
+    if (!title.trim() || !slug.trim() || !description.trim() || !client.trim() || !industry.trim() || !category) {
+      setSaveError("Please fill in Title, Slug, Description, Client, Industry and Category to save the project.")
+      return
+    }
+    setSaveError(null)
+    setIsSaving(true)
+    try {
+      const project = await createProject({
+        title: title.trim(),
+        slug: slug.trim(),
+        description: description.trim(),
+        client: client.trim(),
+        industry: industry.trim(),
+        overview: overview || undefined,
+        challenge: challenge || undefined,
+        solution: solution || undefined,
+        technologies,
+        images: imageUrl ? [imageUrl] : [],
+        thumbnail: imageUrl || undefined,
+        liveUrl: liveUrl || undefined,
+        githubUrl: githubUrl || undefined,
+        results: [],
+        testimonial: undefined,
+        category,
+        featured,
+        displayOrder: Number(displayOrder) || 0,
+        published,
+        seoTitle: seoTitle || undefined,
+        seoDescription: seoDescription || undefined,
+        seoKeywords: seoKeywords || undefined,
+        canonicalUrl: canonicalUrl || undefined,
+        ogImage: ogImage || undefined,
+      })
+      router.push("/admin/portfolio")
+    } catch (err) {
+      console.error("Failed to create project:", err)
+      setSaveError("Failed to save the project. Please check the required fields and try again.")
+    } finally {
+      setIsSaving(false)
     }
   }
 
@@ -246,9 +292,12 @@ export default function NewProjectPage() {
       </Card>
 
       <div className="flex items-center gap-3">
-        <Button onClick={() => router.push("/admin/portfolio")}>Save Project</Button>
+        <Button onClick={handleSave} disabled={isSaving}>
+          {isSaving ? "Saving..." : "Save Project"}
+        </Button>
         <Button variant="outline" onClick={() => router.push("/admin/portfolio")}>Cancel</Button>
       </div>
+      {saveError && <p className="text-sm text-red-400">{saveError}</p>}
     </div>
   )
 }

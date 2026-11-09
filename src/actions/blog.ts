@@ -43,25 +43,71 @@ const createPostSchema = z.object({
 export async function createPost(data: z.infer<typeof createPostSchema>) {
   await requireRole(["SUPER_ADMIN", "ADMIN", "EDITOR"])
   const validated = createPostSchema.parse(data)
-  return prisma.blogPost.create({ data: validated })
+  const post = await prisma.blogPost.create({ data: validated })
+  return {
+    id: post.id,
+    title: post.title,
+    slug: post.slug,
+    excerpt: post.excerpt,
+    content: post.content,
+    author: post.author,
+    authorImage: post.authorImage,
+    featuredImage: post.featuredImage,
+    categories: post.categories,
+    tags: post.tags,
+    published: post.published,
+    featured: post.featured,
+    seoTitle: post.seoTitle,
+    seoDescription: post.seoDescription,
+    createdAt: post.createdAt.toISOString(),
+    updatedAt: post.updatedAt.toISOString(),
+  }
 }
 
-export async function updatePost(id: string, data: Partial<z.infer<typeof createPostSchema>>) {
+const updatePostSchema = createPostSchema.partial()
+
+export async function updatePost(id: string, data: z.infer<typeof updatePostSchema>) {
   await requireRole(["SUPER_ADMIN", "ADMIN", "EDITOR"])
-  return prisma.blogPost.update({ where: { id }, data })
+  const validated = updatePostSchema.parse(data)
+  const post = await prisma.blogPost.update({ where: { id }, data: validated })
+  return {
+    id: post.id,
+    title: post.title,
+    slug: post.slug,
+    excerpt: post.excerpt,
+    content: post.content,
+    author: post.author,
+    authorImage: post.authorImage,
+    featuredImage: post.featuredImage,
+    categories: post.categories,
+    tags: post.tags,
+    published: post.published,
+    featured: post.featured,
+    seoTitle: post.seoTitle,
+    seoDescription: post.seoDescription,
+    createdAt: post.createdAt.toISOString(),
+    updatedAt: post.updatedAt.toISOString(),
+  }
 }
 
 export async function deletePost(id: string) {
   await requireRole(["SUPER_ADMIN", "ADMIN"])
-  return prisma.blogPost.delete({ where: { id } })
+  const post = await prisma.blogPost.delete({ where: { id } })
+  return {
+    id: post.id,
+    title: post.title,
+    slug: post.slug,
+  }
 }
 
-export async function togglePublished(id: string) {
+export async function togglePublished(id: string, published: boolean) {
   await requireRole(["SUPER_ADMIN", "ADMIN", "EDITOR"])
-  const post = await prisma.blogPost.findUnique({ where: { id }, select: { published: true } })
-  if (!post) throw new Error("Post not found")
-  return prisma.blogPost.update({
+  const post = await prisma.blogPost.update({
     where: { id },
-    data: { published: !post.published },
+    data: { published },
   })
+  return {
+    id: post.id,
+    published: post.published,
+  }
 }

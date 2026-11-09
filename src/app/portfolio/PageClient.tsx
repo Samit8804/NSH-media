@@ -4,12 +4,16 @@ import { useState, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Search, ArrowRight } from "lucide-react"
 import Link from "next/link"
-import { PROJECTS_DATA } from "@/data/portfolio"
+import { PROJECTS_DATA, type ProjectData } from "@/data/portfolio"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 
 const categories = ["All", "Web Design", "Development", "Ecommerce", "SEO", "Branding"]
+
+interface PortfolioPageProps {
+  projects?: ProjectData[];
+}
 
 const gradients = [
   "from-[#2563EB] to-[#7C3AED]",
@@ -20,19 +24,20 @@ const gradients = [
   "from-[#84CC16] to-[#22C55E]",
 ]
 
-export default function PortfolioPage() {
+export default function PortfolioPage({ projects: initialProjects }: PortfolioPageProps) {
+  const [projects] = useState<ProjectData[]>(initialProjects ?? PROJECTS_DATA)
   const [activeCategory, setActiveCategory] = useState("All")
   const [searchQuery, setSearchQuery] = useState("")
 
   const filtered = useMemo(() => {
-    return PROJECTS_DATA.filter((project) => {
+    return projects.filter((project) => {
       const matchesCategory = activeCategory === "All" || project.category === activeCategory
       const matchesSearch = project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         project.client.toLowerCase().includes(searchQuery.toLowerCase()) ||
         project.industry.toLowerCase().includes(searchQuery.toLowerCase())
       return matchesCategory && matchesSearch
     })
-  }, [activeCategory, searchQuery])
+  }, [projects, activeCategory, searchQuery])
 
   return (
     <div className="min-h-screen bg-dark-bg">

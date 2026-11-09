@@ -11,6 +11,42 @@ export async function getProjects() {
   })
 }
 
+export async function getAllProjects() {
+  await requireRole(["SUPER_ADMIN", "ADMIN"])
+  const all = await prisma.project.findMany({
+    orderBy: { displayOrder: "asc" },
+  })
+  return all.map((p) => ({
+    id: p.id,
+    title: p.title,
+    slug: p.slug,
+    description: p.description,
+    client: p.client,
+    industry: p.industry,
+    overview: p.overview,
+    challenge: p.challenge,
+    solution: p.solution,
+    technologies: p.technologies,
+    results: p.results,
+    testimonial: p.testimonial,
+    category: p.category,
+    featured: p.featured,
+    displayOrder: p.displayOrder,
+    published: p.published,
+    liveUrl: p.liveUrl,
+    githubUrl: p.githubUrl,
+    images: p.images,
+    thumbnail: p.thumbnail,
+    seoTitle: p.seoTitle,
+    seoDescription: p.seoDescription,
+    seoKeywords: p.seoKeywords,
+    canonicalUrl: p.canonicalUrl,
+    ogImage: p.ogImage,
+    createdAt: p.createdAt.toISOString(),
+    updatedAt: p.updatedAt.toISOString(),
+  }))
+}
+
 export async function getProjectBySlug(slug: string) {
   return prisma.project.findUnique({
     where: { slug },
@@ -54,35 +90,106 @@ const createProjectSchema = z.object({
 export async function createProject(data: z.infer<typeof createProjectSchema>) {
   await requireRole(["SUPER_ADMIN", "ADMIN"])
   const validated = createProjectSchema.parse(data)
-  return prisma.project.create({ data: validated })
+  const project = await prisma.project.create({ data: validated })
+  return {
+    id: project.id,
+    title: project.title,
+    slug: project.slug,
+    description: project.description,
+    client: project.client,
+    industry: project.industry,
+    overview: project.overview,
+    challenge: project.challenge,
+    solution: project.solution,
+    technologies: project.technologies,
+    images: project.images,
+    thumbnail: project.thumbnail,
+    liveUrl: project.liveUrl,
+    githubUrl: project.githubUrl,
+    results: project.results,
+    testimonial: project.testimonial,
+    category: project.category,
+    featured: project.featured,
+    displayOrder: project.displayOrder,
+    published: project.published,
+    seoTitle: project.seoTitle,
+    seoDescription: project.seoDescription,
+    seoKeywords: project.seoKeywords,
+    canonicalUrl: project.canonicalUrl,
+    ogImage: project.ogImage,
+    createdAt: project.createdAt.toISOString(),
+    updatedAt: project.updatedAt.toISOString(),
+  }
 }
 
-export async function updateProject(id: string, data: Partial<z.infer<typeof createProjectSchema>>) {
+const updateProjectSchema = createProjectSchema.partial()
+
+export async function updateProject(id: string, data: z.infer<typeof updateProjectSchema>) {
   await requireRole(["SUPER_ADMIN", "ADMIN"])
-  return prisma.project.update({ where: { id }, data })
+  const validated = updateProjectSchema.parse(data)
+  const project = await prisma.project.update({ where: { id }, data: validated })
+  return {
+    id: project.id,
+    title: project.title,
+    slug: project.slug,
+    description: project.description,
+    client: project.client,
+    industry: project.industry,
+    overview: project.overview,
+    challenge: project.challenge,
+    solution: project.solution,
+    technologies: project.technologies,
+    images: project.images,
+    thumbnail: project.thumbnail,
+    liveUrl: project.liveUrl,
+    githubUrl: project.githubUrl,
+    results: project.results,
+    testimonial: project.testimonial,
+    category: project.category,
+    featured: project.featured,
+    displayOrder: project.displayOrder,
+    published: project.published,
+    seoTitle: project.seoTitle,
+    seoDescription: project.seoDescription,
+    seoKeywords: project.seoKeywords,
+    canonicalUrl: project.canonicalUrl,
+    ogImage: project.ogImage,
+    createdAt: project.createdAt.toISOString(),
+    updatedAt: project.updatedAt.toISOString(),
+  }
 }
 
 export async function deleteProject(id: string) {
   await requireRole(["SUPER_ADMIN", "ADMIN"])
-  return prisma.project.delete({ where: { id } })
+  const project = await prisma.project.delete({ where: { id } })
+  return {
+    id: project.id,
+    title: project.title,
+    slug: project.slug,
+    createdAt: project.createdAt.toISOString(),
+  }
 }
 
-export async function toggleFeatured(id: string) {
+export async function toggleFeatured(id: string, featured: boolean) {
   await requireRole(["SUPER_ADMIN", "ADMIN"])
-  const project = await prisma.project.findUnique({ where: { id }, select: { featured: true } })
-  if (!project) throw new Error("Project not found")
-  return prisma.project.update({
+  const project = await prisma.project.update({
     where: { id },
-    data: { featured: !project.featured },
+    data: { featured },
   })
+  return {
+    id: project.id,
+    featured: project.featured,
+  }
 }
 
-export async function togglePublished(id: string) {
+export async function togglePublished(id: string, published: boolean) {
   await requireRole(["SUPER_ADMIN", "ADMIN"])
-  const project = await prisma.project.findUnique({ where: { id }, select: { published: true } })
-  if (!project) throw new Error("Project not found")
-  return prisma.project.update({
+  const project = await prisma.project.update({
     where: { id },
-    data: { published: !project.published },
+    data: { published },
   })
+  return {
+    id: project.id,
+    published: project.published,
+  }
 }

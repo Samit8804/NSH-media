@@ -19,11 +19,14 @@ import { ArrowLeft, X, ImageIcon } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import MediaPicker from "@/components/admin/MediaPicker"
+import { createPost } from "@/actions/blog"
 
 const allCategories = ["Design", "Development", "SEO", "Marketing", "AI", "Trends", "Accessibility"]
 
 export default function NewBlogPostPage() {
   const router = useRouter()
+  const [isSaving, setIsSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
   const [title, setTitle] = useState("")
   const [slug, setSlug] = useState("")
   const [excerpt, setExcerpt] = useState("")
@@ -42,6 +45,38 @@ export default function NewBlogPostPage() {
   const handleTitleChange = (val: string) => {
     setTitle(val)
     setSlug(slugify(val))
+  }
+
+  const handleSave = async (publish: boolean) => {
+    if (!title.trim() || !slug.trim() || !excerpt.trim() || !content.trim() || !author.trim() || !featuredImage.trim()) {
+      setSaveError("Please fill in Title, Slug, Excerpt, Content, Author and Featured Image to save the post.")
+      return
+    }
+    setSaveError(null)
+    setIsSaving(true)
+    try {
+      await createPost({
+        title: title.trim(),
+        slug: slug.trim(),
+        excerpt: excerpt.trim(),
+        content: content.trim(),
+        author: author.trim(),
+        authorImage: "",
+        featuredImage: featuredImage.trim(),
+        categories,
+        tags,
+        published,
+        featured,
+        seoTitle: seoTitle || undefined,
+        seoDescription: seoDescription || undefined,
+      })
+      router.push("/admin/blog")
+    } catch (err) {
+      console.error("Failed to create post:", err)
+      setSaveError("Failed to save the post. Please check the required fields and try again.")
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   const toggleCategory = (cat: string) => {
@@ -200,11 +235,14 @@ export default function NewBlogPostPage() {
       </Card>
 
       <div className="flex items-center gap-3">
-        <Button variant="outline" onClick={() => { setPublished(false); router.push("/admin/blog") }}>
+        <Button variant="outline" onClick={() => handleSave(false)} disabled={isSaving}>
           Save as Draft
         </Button>
-        <Button onClick={() => router.push("/admin/blog")}>Publish</Button>
+        <Button onClick={() => handleSave(true)} disabled={isSaving}>
+          Publish
+        </Button>
       </div>
+      {saveError && <p className="text-sm text-red-400">{saveError}</p>}
     </div>
   )
 }
