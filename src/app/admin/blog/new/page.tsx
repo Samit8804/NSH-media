@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useEffect, Suspense } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { slugify } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -19,12 +19,14 @@ import { ArrowLeft, X, ImageIcon } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import MediaPicker from "@/components/admin/MediaPicker"
-import { createPost } from "@/actions/blog"
+import { getAllPosts, createPost, updatePost } from "@/actions/blog"
 
 const allCategories = ["Design", "Development", "SEO", "Marketing", "AI", "Trends", "Accessibility"]
 
-export default function NewBlogPostPage() {
+function NewBlogPostForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const editId = searchParams?.get("edit") ?? null
   const [isSaving, setIsSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
   const [title, setTitle] = useState("")
@@ -42,6 +44,31 @@ export default function NewBlogPostPage() {
   const [seoDescription, setSeoDescription] = useState("")
   const [showPicker, setShowPicker] = useState(false)
 
+  useEffect(() => {
+    if (!editId) return
+    getAllPosts()
+      .then((data) => {
+        const post = ((data as unknown as Array<Record<string, unknown>>) || []).find((p) => p.id === editId)
+        if (!post) {
+          setSaveError("Post not found.")
+          return
+        }
+        setTitle((post.title as string) ?? "")
+        setSlug((post.slug as string) ?? "")
+        setExcerpt((post.excerpt as string) ?? "")
+        setContent((post.content as string) ?? "")
+        setAuthor((post.author as string) ?? "")
+        setFeaturedImage((post.featuredImage as string) ?? "")
+        setCategories((post.categories as string[]) ?? [])
+        setTags((post.tags as string[]) ?? [])
+        setPublished((post.published as boolean) ?? false)
+        setFeatured((post.featured as boolean) ?? false)
+        setSeoTitle((post.seoTitle as string) ?? "")
+        setSeoDescription((post.seoDescription as string) ?? "")
+      })
+      .catch(() => setSaveError("Failed to load the post for editing."))
+  }, [editId])
+
   const handleTitleChange = (val: string) => {
     setTitle(val)
     setSlug(slugify(val))
@@ -55,7 +82,7 @@ export default function NewBlogPostPage() {
     setSaveError(null)
     setIsSaving(true)
     try {
-      await createPost({
+      const payload = {
         title: title.trim(),
         slug: slug.trim(),
         excerpt: excerpt.trim(),
@@ -65,14 +92,19 @@ export default function NewBlogPostPage() {
         featuredImage: featuredImage.trim(),
         categories,
         tags,
-        published,
+        published: publish,
         featured,
         seoTitle: seoTitle || undefined,
         seoDescription: seoDescription || undefined,
-      })
+      }
+      if (editId) {
+        await updatePost(editId, payload)
+      } else {
+        await createPost(payload)
+      }
       router.push("/admin/blog")
     } catch (err) {
-      console.error("Failed to create post:", err)
+      console.error("Failed to save post:", err)
       setSaveError("Failed to save the post. Please check the required fields and try again.")
     } finally {
       setIsSaving(false)
@@ -102,7 +134,7 @@ export default function NewBlogPostPage() {
         <Link href="/admin/blog" className="p-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg">
           <ArrowLeft className="h-5 w-5" />
         </Link>
-        <h2 className="text-lg font-semibold text-slate-900">New Blog Post</h2>
+        <h2 className="text-lg font-semibold text-slate-900">{editId ? "Edit Blog Post" : "New Blog Post"}</h2>
       </div>
 
       <Card>
@@ -207,13 +239,16 @@ export default function NewBlogPostPage() {
           </div>
           <div className="flex items-center gap-6">
             <label className="flex items-center gap-2 text-sm">
-              <input type="checkbox" checked={published} onChange={(e) => setPublished(e.target.checked)} className="rounded border-slate-300" />
-              Published
-            </label>
-            <label className="flex items-center gap-2 text-sm">
               <input type="checkbox" checked={featured} onChange={(e) => setFeatured(e.target.checked)} className="rounded border-slate-300" />
               Featured
             </label>
+            <span className="text-sm text-slate-500">
+              {editId
+                ? published
+                  ? "This post is currently published."
+                  : "This post is currently a draft."
+                : "Use the buttons below to save as a draft or publish."}
+            </span>
           </div>
         </CardContent>
       </Card>
@@ -244,5 +279,13 @@ export default function NewBlogPostPage() {
       </div>
       {saveError && <p className="text-sm text-red-400">{saveError}</p>}
     </div>
+  )
+}
+
+export default function NewBlogPostPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-center text-slate-500">Loading...</div>}>
+      <NewBlogPostForm />
+    </Suspense>
   )
 }

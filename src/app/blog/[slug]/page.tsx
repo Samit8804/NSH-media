@@ -1,7 +1,31 @@
-import { getPostBySlug } from '@/actions/blog'
+import { getPostBySlug, getPosts } from '@/actions/blog'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import BlogPostClient from './BlogPostClient'
+
+interface RelatedPost {
+  title: string
+  category: string
+  date: Date | string
+  slug: string
+}
+
+interface BlogPost {
+  id?: string
+  title: string
+  excerpt: string
+  date: Date | string
+  author: string
+  category: string
+  tags: string[]
+  featured: boolean
+  slug: string
+  content?: string
+  featuredImage?: string | null
+  seoTitle?: string | null
+  seoDescription?: string | null
+  authorImage?: string | null
+}
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   try {
@@ -51,10 +75,38 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     url: `/blog/${post.slug}`,
   }
 
+  const allPosts = await getPosts()
+  const relatedPosts = ((allPosts || []) as unknown as Array<Record<string, unknown>>)
+    .filter((p) => (p.categories as string[] | undefined)?.[0] === (post.categories as string[] | undefined)?.[0] && p.slug !== slug)
+    .slice(0, 3)
+    .map((p) => ({
+      title: (p.title as string) ?? "",
+      category: (p.categories as string[] | undefined)?.[0] ?? "General",
+      date: p.createdAt instanceof Date ? p.createdAt.toISOString() : new Date().toISOString(),
+      slug: (p.slug as string) ?? "",
+    }))
+
+  const plainPost: BlogPost = {
+    id: post.id,
+    title: post.title,
+    excerpt: post.excerpt,
+    date: post.createdAt instanceof Date ? post.createdAt.toISOString() : new Date().toISOString(),
+    author: post.author,
+    category: post.categories?.[0] || "General",
+    tags: post.tags ?? [],
+    featured: post.featured,
+    slug: post.slug,
+    content: post.content,
+    featuredImage: post.featuredImage,
+    seoTitle: post.seoTitle,
+    seoDescription: post.seoDescription,
+    authorImage: post.authorImage,
+  }
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <BlogPostClient slug={slug} />
+      <BlogPostClient post={plainPost} relatedPosts={relatedPosts} />
     </>
   )
 }

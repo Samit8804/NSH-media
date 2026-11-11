@@ -38,13 +38,6 @@ const perks = [
   { icon: DollarSign, title: "Competitive Salary", description: "Top-of-market compensation with regular reviews and adjustments." },
 ]
 
-const jobs = [
-  { title: "Senior Frontend Developer", department: "Engineering", location: "Remote / New York", type: "Full-Time", description: "Build world-class web experiences using Next.js, React, and modern frontend technologies." },
-  { title: "UI/UX Designer", department: "Design", location: "Remote / New York", type: "Full-Time", description: "Create beautiful, intuitive interfaces and delightful user experiences for our clients." },
-  { title: "SEO Strategist", department: "Marketing", location: "Remote", type: "Full-Time", description: "Develop and execute data-driven SEO strategies that drive organic growth for our clients." },
-  { title: "Project Manager", department: "Operations", location: "New York", type: "Contract", description: "Lead cross-functional teams to deliver exceptional projects on time and within budget." },
-]
-
 export default function CareersPage() {
   const [selectedJob, setSelectedJob] = useState<string | null>(null)
   const [applied, setApplied] = useState(false)
@@ -102,33 +95,6 @@ export default function CareersPage() {
                 </div>
                 <h3 className="mb-1 font-semibold">{perk.title}</h3>
                 <p className="text-sm leading-relaxed text-silver">{perk.description}</p>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      <section className="section-padding px-6">
-        <div className="container-site max-w-4xl">
-          <motion.div className="mb-16 text-center" {...fadeInUp}>
-            <span className="mb-2 inline-block text-sm font-semibold uppercase tracking-widest text-primary">Open Positions</span>
-            <h2 className="text-section">Join Us</h2>
-          </motion.div>
-          <motion.div className="space-y-6" {...stagger}>
-            {jobs.map((job) => (
-              <motion.div key={job.title} className="glass-card group flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between glass-hover" {...stagger}>
-                <div className="flex-1">
-                  <h3 className="text-lg font-semibold group-hover:text-primary">{job.title}</h3>
-                  <p className="mb-2 text-sm text-silver">{job.description}</p>
-                  <div className="flex flex-wrap gap-3 text-xs text-silver/60">
-                    <span className="flex items-center gap-1"><Briefcase className="h-3 w-3" />{job.department}</span>
-                    <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{job.location}</span>
-                    <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{job.type}</span>
-                  </div>
-                </div>
-                <Button onClick={() => setSelectedJob(job.title)} className="shrink-0 gap-2 bg-primary text-white hover:bg-primary-hover">
-                  Apply Now <ArrowRight className="h-4 w-4" />
-                </Button>
               </motion.div>
             ))}
           </motion.div>

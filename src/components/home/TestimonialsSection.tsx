@@ -4,48 +4,33 @@ import { useState, useEffect, useCallback, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { ChevronLeft, ChevronRight, Star, Quote } from "lucide-react"
 
-const testimonials = [
-  {
-    quote: "NSH Media transformed our online presence completely. Our traffic has doubled and conversions are at an all-time high. Their team's attention to detail is remarkable.",
-    name: "Sarah Mitchell",
-    role: "CEO",
-    company: "Velocity Finance",
-    rating: 5,
-    initials: "SM",
-    gradient: "from-blue-500 to-indigo-600",
-  },
-  {
-    quote: "Working with NSH Media was a game-changer for our startup. They delivered a stunning web application that exceeded our expectations, on time and within budget.",
-    name: "James Chen",
-    role: "CTO",
-    company: "GreenLeaf Organics",
-    rating: 5,
-    initials: "JC",
-    gradient: "from-emerald-500 to-green-600",
-  },
-  {
-    quote: "The team at NSH Media truly understands user experience. They redesigned our platform and the results speak for themselves — higher engagement and happier customers.",
-    name: "Emily Rodriguez",
-    role: "Product Director",
-    company: "PrimeCloud Hub",
-    rating: 5,
-    initials: "ER",
-    gradient: "from-purple-500 to-pink-600",
-  },
-]
+export interface Testimonial {
+  quote: string
+  name: string
+  role: string
+  company: string
+  rating: number
+  initials: string
+  gradient: string
+}
 
-export default function TestimonialsSection() {
+interface TestimonialsSectionProps {
+  testimonials?: Testimonial[]
+}
+
+export default function TestimonialsSection({ testimonials: initialTestimonials }: TestimonialsSectionProps) {
+  const testimonials = initialTestimonials && initialTestimonials.length > 0 ? initialTestimonials : []
   const [current, setCurrent] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   const next = useCallback(() => {
     setCurrent((prev) => (prev + 1) % testimonials.length)
-  }, [])
+  }, [testimonials.length])
 
   const prev = useCallback(() => {
     setCurrent((prev) => (prev - 1 + testimonials.length) % testimonials.length)
-  }, [])
+  }, [testimonials.length])
 
   useEffect(() => {
     if (isPaused) {
@@ -59,6 +44,10 @@ export default function TestimonialsSection() {
   }, [isPaused, next])
 
   const testimonial = testimonials[current]
+
+  if (testimonials.length === 0) {
+    return null
+  }
 
   return (
     <section id="testimonials" className="section-padding bg-secondary relative">

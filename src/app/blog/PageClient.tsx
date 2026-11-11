@@ -23,21 +23,27 @@ const stagger = {
   transition: { duration: 0.5, staggerChildren: 0.08 },
 }
 
-const categories = ["All", "Web Design", "Development", "SEO", "AI & Automation", "Branding", "Business"]
-
-const posts = [
-  { title: "The Future of Web Design: Trends Shaping 2026", excerpt: "Explore the cutting-edge design trends that are redefining user experiences and setting new standards for digital interfaces.", date: new Date("2026-05-15"), author: "Alexandra Chen", category: "Web Design", tags: ["Design Trends", "UX", "UI"], featured: true, slug: "future-of-web-design-2026" },
-  { title: "How AI is Transforming Digital Marketing Strategies", excerpt: "Discover how artificial intelligence is revolutionizing campaign optimization, customer targeting, and content personalization.", date: new Date("2026-05-10"), author: "Marcus Rivera", category: "AI & Automation", tags: ["AI", "Marketing", "Automation"], featured: false, slug: "ai-transforming-digital-marketing" },
-  { title: "SEO Best Practices for 2026: A Complete Guide", excerpt: "Stay ahead of the competition with the latest SEO strategies, from core web vitals to AI-powered search optimization.", date: new Date("2026-05-05"), author: "James Okafor", category: "SEO", tags: ["SEO", "Guide", "Search"], featured: false, slug: "seo-best-practices-2026" },
-  { title: "Building Scalable E-Commerce Platforms with Next.js", excerpt: "Learn how modern frameworks enable fast, secure, and highly scalable online stores that convert visitors into loyal customers.", date: new Date("2026-04-28"), author: "Marcus Rivera", category: "Development", tags: ["Next.js", "E-Commerce", "Performance"], featured: false, slug: "scalable-ecommerce-nextjs" },
-  { title: "The Power of Brand Storytelling in the Digital Age", excerpt: "Why authentic narratives are more important than ever for building meaningful connections with your audience.", date: new Date("2026-04-20"), author: "Sarah Thompson", category: "Branding", tags: ["Branding", "Storytelling", "Strategy"], featured: false, slug: "brand-storytelling-digital-age" },
-  { title: "Measuring What Matters: Analytics for Modern Businesses", excerpt: "A data-driven approach to understanding user behavior and making informed decisions that drive growth.", date: new Date("2026-04-12"), author: "James Okafor", category: "Business", tags: ["Analytics", "Growth", "Data"], featured: false, slug: "measuring-what-matters-analytics" },
-  { title: "Accessibility in Web Development: Why It Matters", excerpt: "An in-depth look at inclusive design practices and how accessibility improves experiences for everyone.", date: new Date("2026-04-05"), author: "Alexandra Chen", category: "Web Design", tags: ["Accessibility", "Inclusive Design", "Standards"], featured: false, slug: "accessibility-web-development" },
-]
-
 const ITEMS_PER_PAGE = 6
 
-export default function BlogPage() {
+interface BlogPost {
+  title: string
+  excerpt: string
+  date: Date | string
+  author: string
+  category: string
+  tags: string[]
+  featured: boolean
+  slug: string
+}
+
+interface BlogPageProps {
+  posts?: BlogPost[]
+  categories?: string[]
+}
+
+export default function BlogPage({ posts: initialPosts, categories: initialCategories }: BlogPageProps) {
+  const posts = initialPosts ?? []
+  const categories = initialCategories && initialCategories.length > 0 ? initialCategories : ["All", "Web Design", "Development", "SEO", "AI & Automation", "Branding", "Business"]
   const [search, setSearch] = useState("")
   const [activeCategory, setActiveCategory] = useState("All")
   const [currentPage, setCurrentPage] = useState(1)

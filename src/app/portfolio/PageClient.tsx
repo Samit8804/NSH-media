@@ -4,12 +4,10 @@ import { useState, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Search, ArrowRight } from "lucide-react"
 import Link from "next/link"
-import { PROJECTS_DATA, type ProjectData } from "@/data/portfolio"
+import type { ProjectData } from "@/data/portfolio"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
-
-const categories = ["All", "Web Design", "Development", "Ecommerce", "SEO", "Branding"]
 
 interface PortfolioPageProps {
   projects?: ProjectData[];
@@ -25,9 +23,14 @@ const gradients = [
 ]
 
 export default function PortfolioPage({ projects: initialProjects }: PortfolioPageProps) {
-  const [projects] = useState<ProjectData[]>(initialProjects ?? PROJECTS_DATA)
+  const [projects] = useState<ProjectData[]>(initialProjects ?? [])
   const [activeCategory, setActiveCategory] = useState("All")
   const [searchQuery, setSearchQuery] = useState("")
+
+  const categories = useMemo(
+    () => ["All", ...Array.from(new Set((projects ?? []).map((p) => p.category).filter(Boolean)))],
+    [projects]
+  )
 
   const filtered = useMemo(() => {
     return projects.filter((project) => {

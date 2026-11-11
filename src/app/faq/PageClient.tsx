@@ -16,46 +16,25 @@ const fadeInUp = {
   transition: { duration: 0.6 },
 }
 
-const tabs = ["General", "Services", "Pricing", "Support"]
-
-const faqs: Record<string, { q: string; a: string }[]> = {
-  General: [
-    { q: "What is NSH Media?", a: "NSH Media is a full-service digital agency specializing in web design, development, SEO, AI automation, branding, and e-commerce solutions. We help businesses build and grow their digital presence." },
-    { q: "Where are you located?", a: "Our headquarters is in New York City, but we work with clients around the world through our distributed team." },
-    { q: "What industries do you serve?", a: "We work across a wide range of industries including technology, healthcare, retail, finance, education, and professional services." },
-    { q: "How long does a typical project take?", a: "Project timelines vary depending on scope. A standard website takes 4-8 weeks, while complex e-commerce or AI projects may take 12-16 weeks." },
-    { q: "Do you work with startups?", a: "Absolutely. We love working with startups and offer scalable solutions that grow with your business." },
-  ],
-  Services: [
-    { q: "What services do you offer?", a: "We offer web design, web development, SEO, AI automation, branding, e-commerce development, and ongoing maintenance services." },
-    { q: "Do you offer post-launch support?", a: "Yes, all our plans include post-launch support. The duration and scope depend on your chosen plan." },
-    { q: "Can you redesign an existing website?", a: "Yes, we frequently redesign and modernize existing websites. We audit your current site and develop a comprehensive improvement plan." },
-    { q: "Do you provide content writing?", a: "We partner with professional copywriters and can include content creation as part of your project scope." },
-    { q: "What technology stack do you use?", a: "We primarily use Next.js, React, Tailwind CSS, Node.js, and various cloud platforms. We select the best technology for each project's needs." },
-  ],
-  Pricing: [
-    { q: "How much does a website cost?", a: "Our pricing starts at $499/month for the Starter plan and goes up to custom Enterprise pricing. Each plan is designed to deliver exceptional value." },
-    { q: "Is there a contract term?", a: "We offer both monthly and annual billing. Annual plans come with a 20% discount. There are no long-term lock-in contracts beyond your billing period." },
-    { q: "What payment methods do you accept?", a: "We accept all major credit cards, PayPal, and wire transfers for enterprise clients." },
-    { q: "Do you offer refunds?", a: "Yes, we provide a 14-day money-back guarantee on all plans. Please refer to our refund policy for full details." },
-    { q: "Are there any hidden fees?", a: "No hidden fees. Our pricing is transparent and includes everything outlined in your plan." },
-  ],
-  Support: [
-    { q: "How do I get technical support?", a: "You can reach our support team via email, live chat, or phone depending on your plan. Enterprise clients get 24/7 priority support." },
-    { q: "What are your support hours?", a: "Standard support is available Monday through Friday, 9 AM to 6 PM EST. Premium and Enterprise plans include extended and weekend support." },
-    { q: "How quickly do you respond?", a: "Standard plans receive responses within 24 hours. Premium within 4 hours, and Enterprise within 1 hour." },
-    { q: "Can you help with third-party integrations?", a: "Yes, our team can help integrate your site with CRMs, marketing tools, analytics platforms, and other third-party services." },
-    { q: "Do you offer emergency support?", a: "Enterprise plans include emergency support with guaranteed response times. We can also arrange emergency support on other plans." },
-  ],
+interface Faq {
+  question: string
+  answer: string
 }
 
-export default function FAQPage() {
-  const [search, setSearch] = useState("")
-  const [activeTab, setActiveTab] = useState("General")
+interface FAQPageProps {
+  faqsByCategory?: Record<string, Faq[]>
+  categories?: string[]
+}
 
-  const currentFaqs = faqs[activeTab] || []
+export default function FAQPage({ faqsByCategory, categories }: FAQPageProps) {
+  const [search, setSearch] = useState("")
+  const [activeTab, setActiveTab] = useState(categories?.[0] || "General")
+
+  const tabs = categories && categories.length > 0 ? categories : ["General"]
+  const currentFaqs = faqsByCategory?.[activeTab] || []
+
   const filtered = search
-    ? currentFaqs.filter((f) => f.q.toLowerCase().includes(search.toLowerCase()) || f.a.toLowerCase().includes(search.toLowerCase()))
+    ? currentFaqs.filter((f) => f.question.toLowerCase().includes(search.toLowerCase()) || f.answer.toLowerCase().includes(search.toLowerCase()))
     : currentFaqs
 
   return (
@@ -68,7 +47,7 @@ export default function FAQPage() {
             <h1 className="text-hero mb-6">
               Frequently Asked{" "}<span className="text-gradient">Questions</span>
             </h1>
-            <p className="mx-auto max-w-2xl text-lg leading-relaxed text-silver">
+            <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-silver">
               Everything you need to know about NSH Media. Cannot find what you are looking for? Reach out to our team.
             </p>
           </motion.div>
@@ -102,8 +81,8 @@ export default function FAQPage() {
               <Accordion type="single" collapsible className="w-full space-y-4">
                 {filtered.map((faq, i) => (
                   <AccordionItem key={i} value={`faq-${i}`} className="glass-card !rounded-xl overflow-hidden border-0 [&[data-state=open]]:border [&[data-state=open]]:border-primary/30">
-                    <AccordionTrigger className="text-left font-medium px-6 py-4 hover:no-underline">{faq.q}</AccordionTrigger>
-                    <AccordionContent className="leading-relaxed text-silver px-6 pb-4">{faq.a}</AccordionContent>
+                    <AccordionTrigger className="text-left font-medium px-6 py-4 hover:no-underline">{faq.question}</AccordionTrigger>
+                    <AccordionContent className="leading-relaxed text-silver px-6 pb-4">{faq.answer}</AccordionContent>
                   </AccordionItem>
                 ))}
               </Accordion>

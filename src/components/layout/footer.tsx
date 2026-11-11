@@ -11,7 +11,6 @@ const services = [
   { label: "E-Commerce", href: "/services/e-commerce" },
   { label: "SEO", href: "/services/seo" },
   { label: "Branding", href: "/services/branding" },
-  { label: "Maintenance", href: "/services/maintenance" },
   { label: "AI Automation", href: "/services/ai-automation" },
 ]
 

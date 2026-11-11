@@ -30,30 +30,6 @@ const values = [
   { icon: TrendingUp, title: "Growth", description: "We are committed to continuous learning and helping our clients scale their digital presence." },
 ]
 
-const timeline = [
-  { year: "2020", title: "Founded", description: "NSH Media was established with a vision to transform digital experiences for businesses worldwide." },
-  { year: "2021", title: "First 50 Clients", description: "Reached the milestone of 50 satisfied clients across web development and branding projects." },
-  { year: "2022", title: "Expanded Services", description: "Launched AI automation, SEO, and e-commerce divisions to meet growing client demand." },
-  { year: "2023", title: "Team Growth", description: "Grew to a team of 25+ talented professionals spanning design, development, and strategy." },
-  { year: "2024", title: "Global Reach", description: "Expanded operations internationally, serving clients across North America, Europe, and Asia." },
-  { year: "2025", title: "Industry Leaders", description: "Recognized as a top digital agency with 200+ successful projects and multiple industry awards." },
-  { year: "2026", title: "Innovation Hub", description: "Launched our AI research division and opened a new innovation lab in Silicon Valley." },
-]
-
-const team = [
-  { name: "Alexandra Chen", position: "CEO & Founder", initials: "AC" },
-  { name: "Marcus Rivera", position: "CTO", initials: "MR" },
-  { name: "Sarah Thompson", position: "Creative Director", initials: "ST" },
-  { name: "James Okafor", position: "Head of Strategy", initials: "JO" },
-]
-
-const stats = [
-  { value: "200+", label: "Projects Delivered" },
-  { value: "98%", label: "Client Satisfaction" },
-  { value: "50+", label: "Team Members" },
-  { value: "6+", label: "Years of Excellence" },
-]
-
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-dark-bg">
@@ -132,71 +108,6 @@ export default function AboutPage() {
               </motion.div>
             ))}
           </motion.div>
-        </div>
-      </section>
-
-      <section className="px-6 py-24 bg-secondary">
-        <div className="container-site max-w-4xl">
-          <motion.div className="mb-16 text-center" {...fadeInUp}>
-            <span className="mb-2 inline-block text-sm font-semibold uppercase tracking-widest text-primary">Timeline</span>
-            <h2 className="text-section">Our Journey</h2>
-          </motion.div>
-          <div className="relative">
-            <div className="absolute left-[23px] top-0 h-full w-0.5 bg-primary/20" />
-            <div className="space-y-12">
-              {timeline.map((item, i) => (
-                <motion.div key={item.year} className="relative flex items-start gap-8" initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: "-60px" }} transition={{ duration: 0.5, delay: i * 0.1 }}>
-                  <div className="relative z-10 flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-2 border-primary bg-dark-bg">
-                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">{item.year.slice(2)}</div>
-                  </div>
-                  <div className="flex-1 pt-1">
-                    <h3 className="text-xl font-semibold">{item.title}</h3>
-                    <p className="mt-1 text-sm leading-relaxed text-silver">{item.description}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="section-padding px-6">
-        <div className="container-site">
-          <motion.div className="mb-16 text-center" {...fadeInUp}>
-            <span className="mb-2 inline-block text-sm font-semibold uppercase tracking-widest text-primary">Team</span>
-            <h2 className="text-section">Meet the People Behind the Work</h2>
-          </motion.div>
-          <motion.div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4" {...stagger}>
-            {team.map((member) => (
-              <motion.div key={member.name} className="glass-card p-8 text-center group glass-hover" {...stagger}>
-                <div className="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-[#7C3AED]/20 text-2xl font-bold text-primary">
-                  {member.initials}
-                </div>
-                <h3 className="text-lg font-semibold">{member.name}</h3>
-                <p className="mb-4 text-sm font-medium text-primary">{member.position}</p>
-                <div className="flex justify-center gap-3">
-                  {[Globe, MessageCircle, Linkedin].map((Icon, i) => (
-                    <a key={i} href="#" className="flex h-9 w-9 items-center justify-center rounded-lg bg-secondary text-silver transition-colors hover:bg-primary hover:text-white">
-                      <Icon className="h-4 w-4" />
-                    </a>
-                  ))}
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      <section className="relative overflow-hidden px-6 py-20 bg-mesh">
-        <div className="relative container-site">
-          <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
-            {stats.map((stat) => (
-              <motion.div key={stat.label} className="glass-card p-8 text-center" initial={{ opacity: 0, scale: 0.8 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.5 }}>
-                <div className="text-4xl font-bold text-white">{stat.value}</div>
-                <div className="mt-1 text-sm font-medium text-primary-hover">{stat.label}</div>
-              </motion.div>
-            ))}
-          </div>
         </div>
       </section>
 

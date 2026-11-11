@@ -24,6 +24,12 @@ export async function getFeaturedPosts() {
   })
 }
 
+export async function getAllPosts() {
+  return prisma.blogPost.findMany({
+    orderBy: { createdAt: "desc" },
+  })
+}
+
 const createPostSchema = z.object({
   title: z.string().min(1),
   slug: z.string().min(1),

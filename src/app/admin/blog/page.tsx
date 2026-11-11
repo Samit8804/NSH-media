@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
@@ -14,35 +15,50 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import { getAllPosts, deletePost } from "@/actions/blog"
 
 interface Post {
-  id: number
+  id: string
   title: string
   author: string
   categories: string[]
   status: "Draft" | "Published"
   date: string
+  slug?: string
 }
 
-const initialPosts: Post[] = [
-  { id: 1, title: "Top Web Design Trends in 2026", author: "John Doe", categories: ["Design", "Trends"], status: "Published", date: "2026-06-22" },
-  { id: 2, title: "How to Choose the Right CMS", author: "Sarah Lee", categories: ["Development"], status: "Published", date: "2026-06-19" },
-  { id: 3, title: "SEO Strategies That Actually Work", author: "John Doe", categories: ["SEO", "Marketing"], status: "Draft", date: "2026-06-15" },
-  { id: 4, title: "The Future of AI in Marketing", author: "Mike Chen", categories: ["AI", "Marketing"], status: "Draft", date: "2026-06-12" },
-  { id: 5, title: "Building Accessible Websites", author: "Sarah Lee", categories: ["Development", "Accessibility"], status: "Published", date: "2026-06-08" },
-]
-
 export default function BlogPage() {
-  const [posts, setPosts] = useState<Post[]>(initialPosts)
+  const router = useRouter()
+  const [posts, setPosts] = useState<Post[]>([])
   const [search, setSearch] = useState("")
-  const [deleteId, setDeleteId] = useState<number | null>(null)
+  const [deleteId, setDeleteId] = useState<string | null>(null)
+
+  useEffect(() => {
+    getAllPosts()
+      .then((data) => {
+        const list = (data as unknown as Array<Record<string, unknown>>) || []
+        setPosts(
+          list.map((p) => ({
+            id: p.id as string,
+            title: (p.title as string) ?? "",
+            author: (p.author as string) ?? "",
+            categories: (p.categories as string[]) ?? [],
+            status: ((p.published as boolean) ? "Published" : "Draft") as "Draft" | "Published",
+            date: p.createdAt ? new Date(p.createdAt as string).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "",
+            slug: (p.slug as string) ?? "",
+          }))
+        )
+      })
+      .catch(() => setPosts([]))
+  }, [])
 
   const filtered = posts.filter((p) =>
     p.title.toLowerCase().includes(search.toLowerCase())
   )
 
-  const handleDelete = () => {
-    if (deleteId !== null) {
+  const handleDelete = async () => {
+    if (deleteId) {
+      await deletePost(deleteId)
       setPosts(posts.filter((p) => p.id !== deleteId))
       setDeleteId(null)
     }
@@ -69,71 +85,74 @@ export default function BlogPage() {
         </Button>
       </div>
 
-      <div className="glass-dashboard overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-white/10 text-silver text-xs uppercase tracking-wider">
-                <th className="pb-3 font-medium">Title</th>
-                <th className="pb-3 font-medium">Author</th>
-                <th className="pb-3 font-medium">Categories</th>
-                <th className="pb-3 font-medium">Status</th>
-                <th className="pb-3 font-medium">Date</th>
-                <th className="pb-3 font-medium text-right">Actions</th>
+      <div className="rounded-2xl border border-white/10 bg-white/[0.03]">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b border-white/10 text-left text-xs uppercase tracking-wider text-slate-400">
+              <th className="px-6 py-4 font-medium">Title</th>
+              <th className="px-6 py-4 font-medium">Author</th>
+              <th className="px-6 py-4 font-medium">Categories</th>
+              <th className="px-6 py-4 font-medium">Status</th>
+              <th className="px-6 py-4 font-medium">Date</th>
+              <th className="px-6 py-4 font-medium text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filtered.map((post, i) => (
+              <motion.tr
+                key={post.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.05 }}
+                className="border-b border-white/10 last:border-0 hover:bg-white/[0.04]"
+              >
+                <td className="px-6 py-3 font-medium text-white">{post.title}</td>
+                <td className="px-6 py-3 text-silver">{post.author}</td>
+                <td className="px-6 py-3">
+                  <div className="flex flex-wrap gap-1">
+                    {post.categories.map((cat) => (
+                      <span key={cat} className="px-2 py-0.5 rounded-full bg-white/[0.06] text-silver text-xs">
+                        {cat}
+                      </span>
+                    ))}
+                  </div>
+                </td>
+                <td className="px-6 py-3">
+                  <span className={cn(
+                    "inline-flex px-2 py-1 rounded-full text-xs font-medium",
+                    post.status === "Published" ? "bg-emerald-500/10 text-emerald-400" : "bg-amber-500/10 text-amber-400"
+                  )}>
+                    {post.status}
+                  </span>
+                </td>
+                <td className="px-6 py-3 text-silver">{post.date}</td>
+                <td className="px-6 py-3 text-right">
+                  <div className="flex items-center justify-end gap-1">
+                    <button
+                      className="p-2 text-silver hover:text-primary hover:bg-white/[0.04] rounded-lg"
+                      onClick={() => router.push(`/admin/blog/new?edit=${post.id}`)}
+                      aria-label={`Edit ${post.title}`}
+                    >
+                      <Edit3 className="h-4 w-4" />
+                    </button>
+                    <button
+                      className="p-2 text-silver hover:text-red-400 hover:bg-white/[0.04] rounded-lg"
+                      onClick={() => setDeleteId(post.id)}
+                      aria-label={`Delete ${post.title}`}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </td>
+              </motion.tr>
+            ))}
+            {filtered.length === 0 && (
+              <tr>
+                <td colSpan={6} className="px-6 py-8 text-center text-slate-400">No posts found</td>
               </tr>
-            </thead>
-            <tbody>
-              {filtered.map((post, i) => (
-                <motion.tr
-                  key={post.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                  className="border-b border-white/10 last:border-0 hover:bg-white/[0.04]"
-                >
-                  <td className="py-3 font-medium text-white">{post.title}</td>
-                  <td className="py-3 text-silver">{post.author}</td>
-                  <td className="py-3">
-                    <div className="flex flex-wrap gap-1">
-                      {post.categories.map((cat) => (
-                        <span key={cat} className="px-2 py-0.5 rounded-full bg-white/[0.06] text-silver text-xs">
-                          {cat}
-                        </span>
-                      ))}
-                    </div>
-                  </td>
-                  <td className="py-3">
-                    <span className={cn(
-                      "inline-flex px-2 py-1 rounded-full text-xs font-medium",
-                      post.status === "Published" ? "bg-emerald-500/10 text-emerald-400" : "bg-amber-500/10 text-amber-400"
-                    )}>
-                      {post.status}
-                    </span>
-                  </td>
-                  <td className="py-3 text-silver">{post.date}</td>
-                  <td className="py-3 text-right">
-                    <div className="flex items-center justify-end gap-1">
-                      <button className="p-2 text-silver hover:text-primary hover:bg-white/[0.04] rounded-lg">
-                        <Edit3 className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => setDeleteId(post.id)}
-                        className="p-2 text-silver hover:text-red-400 hover:bg-white/[0.04] rounded-lg"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </td>
-                </motion.tr>
-              ))}
-              {filtered.length === 0 && (
-                <tr>
-                  <td colSpan={6} className="py-8 text-center text-slate-400">No posts found</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+            )}
+          </tbody>
+        </table>
       </div>
 
       <Dialog open={deleteId !== null} onOpenChange={() => setDeleteId(null)}>

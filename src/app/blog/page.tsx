@@ -1,5 +1,8 @@
 import type { Metadata } from "next"
+import { getPosts } from "@/actions/blog"
 import BlogPage from "./PageClient"
+
+export const dynamic = "force-dynamic"
 
 export const metadata: Metadata = {
   title: "Blog",
@@ -25,6 +28,19 @@ export const metadata: Metadata = {
   },
 }
 
-export default function Page() {
-  return <BlogPage />
+export default async function Page() {
+  const posts = await getPosts()
+  const jsonPosts = (posts || []).map((p) => ({
+    title: p.title,
+    excerpt: p.excerpt,
+    date: p.createdAt instanceof Date ? p.createdAt.toISOString() : new Date().toISOString(),
+    author: p.author,
+    category: p.categories?.[0] || "General",
+    tags: p.tags ?? [],
+    featured: p.featured,
+    slug: p.slug,
+  }))
+  const categories = ["All", ...Array.from(new Set(jsonPosts.map((p) => p.category).filter(Boolean)))]
+
+  return <BlogPage posts={jsonPosts} categories={categories} />
 }

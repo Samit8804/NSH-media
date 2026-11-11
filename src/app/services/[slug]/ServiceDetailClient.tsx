@@ -3,7 +3,6 @@
 import { motion } from "framer-motion"
 import { Palette, Code2, ShoppingCart, Search, Fingerprint, Brain, Check, ArrowRight, ArrowLeft } from "lucide-react"
 import Link from "next/link"
-import { SERVICES_DATA } from "@/data/services"
 import { Button } from "@/components/ui/button"
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion"
 
@@ -22,12 +21,36 @@ const stagger = {
   initial: { opacity: 0, y: 20 },
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true, margin: "-100px" },
-  transition: { duration: 0.5, staggerChildren: 0.1 },
+  transition: { duration: 0.6 },
 }
 
-export default function ServiceDetailClient({ slug }: { slug: string }) {
-  const service = SERVICES_DATA.find((s) => s.slug === slug)
+interface ProcessStep {
+  title: string
+  description: string
+}
 
+interface Faq {
+  question: string
+  answer: string
+}
+
+export interface ServiceDetail {
+  id?: string
+  title: string
+  slug: string
+  description: string
+  icon: string
+  benefits?: string[]
+  features?: string[]
+  process?: ProcessStep[]
+  faqs?: Faq[]
+}
+
+interface ServiceDetailClientProps {
+  service: ServiceDetail | null
+}
+
+export default function ServiceDetailClient({ service }: ServiceDetailClientProps) {
   if (!service) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-dark-bg px-6">
@@ -45,6 +68,10 @@ export default function ServiceDetailClient({ slug }: { slug: string }) {
     )
   }
 
+  const benefits = service.benefits ?? []
+  const features = service.features ?? []
+  const process = service.process ?? []
+  const faqs = service.faqs ?? []
   const IconComponent = iconMap[service.icon]
 
   return (
@@ -57,7 +84,7 @@ export default function ServiceDetailClient({ slug }: { slug: string }) {
               {IconComponent && <IconComponent className="h-10 w-10" />}
             </div>
             <h1 className="text-hero"><span className="text-gradient">{service.title}</span></h1>
-            <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-silver">{service.longDescription}</p>
+            <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-silver">{service.description}</p>
           </motion.div>
         </div>
       </section>
@@ -69,7 +96,7 @@ export default function ServiceDetailClient({ slug }: { slug: string }) {
               <span className="mb-2 inline-block text-sm font-semibold uppercase tracking-widest text-primary">Benefits</span>
               <h2 className="text-subsection mb-8">Why Choose This Service?</h2>
               <div className="grid gap-6">
-                {service.benefits.map((benefit, i) => (
+                {benefits.map((benefit, i) => (
                   <motion.div key={i} className="glass-card flex items-start gap-4 p-5" initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: i * 0.1 }}>
                     <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10">
                       <Check className="h-4 w-4 text-primary" />
@@ -83,7 +110,7 @@ export default function ServiceDetailClient({ slug }: { slug: string }) {
               <span className="mb-2 inline-block text-sm font-semibold uppercase tracking-widest text-primary">Features</span>
               <h2 className="text-subsection mb-8">What&apos;s Included</h2>
               <div className="grid gap-4">
-                {service.features.map((feature, i) => (
+                {features.map((feature, i) => (
                   <motion.div key={i} className="flex items-center gap-3" initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: i * 0.1 }}>
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-success/10">
                       <Check className="h-4 w-4 text-success" />
@@ -107,7 +134,7 @@ export default function ServiceDetailClient({ slug }: { slug: string }) {
           <div className="relative">
             <div className="absolute left-[31px] top-0 h-full w-0.5 bg-primary/20" />
             <div className="space-y-12">
-              {service.process.map((step, i) => (
+              {process.map((step, i) => (
                 <motion.div key={step.title} className="relative flex items-start gap-8" initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: "-60px" }} transition={{ duration: 0.5, delay: i * 0.15 }}>
                   <div className="relative z-10 flex h-14 w-14 shrink-0 items-center justify-center rounded-full border-2 border-primary bg-dark-bg text-lg font-bold text-primary">{i + 1}</div>
                   <div className="flex-1 pt-2">
@@ -129,7 +156,7 @@ export default function ServiceDetailClient({ slug }: { slug: string }) {
           </motion.div>
           <motion.div {...fadeInUp}>
             <Accordion type="single" collapsible className="w-full space-y-4">
-              {service.faqs.map((faq, i) => (
+              {faqs.map((faq, i) => (
                 <AccordionItem key={i} value={`faq-${i}`} className="glass-card !rounded-xl overflow-hidden border-0 [&[data-state=open]]:border [&[data-state=open]]:border-primary/30">
                   <AccordionTrigger className="text-left text-base font-medium px-6 py-4 hover:no-underline">{faq.question}</AccordionTrigger>
                   <AccordionContent className="leading-relaxed text-silver px-6 pb-4">{faq.answer}</AccordionContent>
@@ -141,7 +168,7 @@ export default function ServiceDetailClient({ slug }: { slug: string }) {
       </section>
 
       <section className="relative overflow-hidden px-6 py-20 bg-mesh">
-        <motion.div className="relative container-site text-center" {...fadeInUp}>
+        <motion.div {...fadeInUp} className="relative container-site text-center">
           <h2 className="text-subsection mb-4">Ready to Get Started?</h2>
           <p className="mb-8 text-lg text-silver">Let&apos;s discuss how our {service.title} service can transform your business.</p>
           <Link href="/contact">

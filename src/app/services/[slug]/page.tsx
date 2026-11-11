@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
-import { SERVICES_DATA } from '@/data/services'
+import { getServiceBySlug } from '@/actions/services'
 import ServiceDetailClient from './ServiceDetailClient'
 
 const SERVICE_IMAGES: Record<string, string> = {
@@ -15,25 +15,25 @@ const SERVICE_IMAGES: Record<string, string> = {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   try {
     const { slug } = await params
-    const service = SERVICES_DATA.find((s) => s.slug === slug)
+    const service = await getServiceBySlug(slug)
     if (!service) return {}
     const image = SERVICE_IMAGES[service.slug]
     return {
-      title: service.title,
-      description: service.description,
+      title: service.seoTitle || service.title,
+      description: service.seoDescription || service.description,
       openGraph: {
-        title: service.title,
-        description: service.description,
-        url: `/services/${service.slug}`,
+        title: service.seoTitle || service.title,
+        description: service.seoDescription || service.description,
+        url: `/services/${slug}`,
         ...(image && { images: [{ url: image, width: 1200, height: 630 }] }),
       },
       twitter: {
         card: 'summary_large_image',
-        title: service.title,
-        description: service.description,
+        title: service.seoTitle || service.title,
+        description: service.seoDescription || service.description,
         ...(image && { images: [image] }),
       },
-      alternates: { canonical: `/services/${service.slug}` },
+      alternates: { canonical: `/services/${slug}` },
     }
   } catch {
     return {}
@@ -42,7 +42,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function ServiceDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const service = SERVICES_DATA.find((s) => s.slug === slug)
+  const service = await getServiceBySlug(slug)
 
   if (!service) notFound()
 
@@ -52,13 +52,25 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
     name: service.title,
     description: service.description,
     provider: { '@type': 'Organization', name: 'NSH Media' },
-    url: `/services/${service.slug}`,
+    url: `/services/${slug}`,
+  }
+
+  const plainService = {
+    id: service.id,
+    title: service.title,
+    slug: service.slug,
+    description: service.description,
+    icon: service.icon,
+    benefits: (service.benefits ?? []) as string[],
+    features: (service.features ?? []) as string[],
+    process: (service.process ?? []) as Array<{ title: string; description: string }>,
+    faqs: (service.faqs ?? []) as Array<{ question: string; answer: string }>,
   }
 
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <ServiceDetailClient slug={slug} />
+      <ServiceDetailClient service={plainService} />
     </>
   )
 }

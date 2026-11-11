@@ -6,29 +6,6 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import * as AccordionPrimitive from "@radix-ui/react-accordion"
 
-const faqs = [
-  {
-    question: "What services does NSH Media offer?",
-    answer: "We offer a comprehensive range of digital services including web design, web development, e-commerce solutions, SEO optimization, branding, ongoing maintenance, AI automation, and custom web application development.",
-  },
-  {
-    question: "How long does a typical project take?",
-    answer: "Project timelines vary based on scope and complexity. A standard website typically takes 4-8 weeks, while more complex web applications can take 8-16 weeks. We provide detailed timelines during our discovery phase.",
-  },
-  {
-    question: "What is your design and development process?",
-    answer: "Our process follows six key phases: Discovery, Strategy, Design, Development, Testing, and Launch. We maintain transparent communication throughout, providing regular updates and opportunities for feedback at each stage.",
-  },
-  {
-    question: "Do you offer ongoing support and maintenance?",
-    answer: "Yes, we offer comprehensive maintenance packages to keep your digital products running smoothly. This includes security updates, performance monitoring, content updates, and technical support.",
-  },
-  {
-    question: "How much do your services cost?",
-    answer: "Pricing depends on the scope and complexity of your project. We provide tailored quotes after understanding your specific requirements during an initial consultation. Contact us for a free estimate.",
-  },
-]
-
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
@@ -39,7 +16,22 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] as const } },
 }
 
-export default function FAQPreview() {
+interface FAQ {
+  question: string
+  answer: string
+}
+
+interface FAQPreviewProps {
+  faqs?: FAQ[]
+}
+
+export default function FAQPreview({ faqs }: FAQPreviewProps) {
+  const items = faqs ?? []
+
+  if (items.length === 0) {
+    return null
+  }
+
   return (
     <section className="section-padding bg-background relative">
       <div className="absolute inset-0 bg-grid-subtle" />
@@ -72,7 +64,7 @@ export default function FAQPreview() {
           viewport={{ once: true }}
         >
           <AccordionPrimitive.Root type="single" collapsible className="w-full space-y-3">
-            {faqs.map((faq, index) => (
+            {items.map((faq, index) => (
               <motion.div key={index} variants={itemVariants}>
                 <AccordionPrimitive.Item
                   value={`item-${index}`}

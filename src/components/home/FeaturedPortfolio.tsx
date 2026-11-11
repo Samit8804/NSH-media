@@ -5,29 +5,17 @@ import { ArrowUpRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 
-const projects = [
-  {
-    title: "Velocity Finance",
-    category: "Web Application",
-    gradient: "from-blue-600 to-indigo-700",
-    tech: ["React", "Node.js", "MongoDB"],
-    slug: "velocity-finance",
-  },
-  {
-    title: "GreenLeaf Organics",
-    category: "E-Commerce",
-    gradient: "from-emerald-500 to-green-700",
-    tech: ["Next.js", "Stripe", "Tailwind"],
-    slug: "greenleaf-organics",
-  },
-  {
-    title: "PrimeCloud Hub",
-    category: "SaaS Platform",
-    gradient: "from-purple-600 to-pink-700",
-    tech: ["React", "AWS", "GraphQL"],
-    slug: "primecloud-hub",
-  },
-]
+interface FeaturedProject {
+  title: string
+  category: string
+  tech: string[]
+  slug: string
+  gradient?: string
+}
+
+interface FeaturedPortfolioProps {
+  projects?: FeaturedProject[]
+}
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -39,7 +27,13 @@ const cardVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] as const } },
 }
 
-export default function FeaturedPortfolio() {
+export default function FeaturedPortfolio({ projects }: FeaturedPortfolioProps) {
+  const items = projects ?? []
+
+  if (items.length === 0) {
+    return null
+  }
+
   return (
     <section id="portfolio" className="section-padding relative">
       <div className="absolute inset-0 bg-grid-subtle" />
@@ -72,13 +66,13 @@ export default function FeaturedPortfolio() {
           viewport={{ once: true }}
           className="grid grid-cols-1 md:grid-cols-3 gap-6"
         >
-          {projects.map((project) => (
+          {items.map((project) => (
             <motion.div
-              key={project.title}
+              key={project.slug}
               variants={cardVariants}
               className="group relative rounded-[20px] overflow-hidden cursor-pointer glass-card"
             >
-              <div className={`h-72 bg-gradient-to-br ${project.gradient} flex items-center justify-center relative overflow-hidden`}>
+              <div className={`h-72 bg-gradient-to-br ${project.gradient ?? "from-blue-600 to-indigo-700"} flex items-center justify-center relative overflow-hidden`}>
                 <span className="text-white/10 text-7xl font-bold tracking-tighter font-heading select-none group-hover:scale-110 transition-transform duration-500">
                   {project.title.charAt(0)}
                 </span>

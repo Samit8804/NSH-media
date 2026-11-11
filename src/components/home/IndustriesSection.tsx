@@ -12,17 +12,20 @@ import {
   Briefcase,
 } from "lucide-react"
 import Link from "next/link"
+import { INDUSTRIES } from "@/data/industries";
+import type { LucideIcon } from "lucide-react";
 
-const industries = [
-  { name: "Healthcare", icon: HeartPulse, slug: "healthcare" },
-  { name: "Finance", icon: Banknote, slug: "finance" },
-  { name: "E-Commerce", icon: ShoppingBag, slug: "e-commerce" },
-  { name: "Education", icon: GraduationCap, slug: "education" },
-  { name: "Real Estate", icon: Building2, slug: "real-estate" },
-  { name: "Technology", icon: Cpu, slug: "technology" },
-  { name: "Hospitality", icon: Hotel, slug: "hospitality" },
-  { name: "Startups", icon: Briefcase, slug: "startups" },
-]
+const industryIcons: Record<string, LucideIcon> = {
+  healthcare: HeartPulse,
+  finance: Banknote,
+  "e-commerce": ShoppingBag,
+  ecommerce: ShoppingBag,
+  education: GraduationCap,
+  "real-estate": Building2,
+  technology: Cpu,
+  hospitality: Hotel,
+  startups: Briefcase,
+}
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -59,8 +62,8 @@ export default function IndustriesSection() {
           viewport={{ once: true }}
           className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"
         >
-          {industries.map((industry) => {
-            const Icon = industry.icon
+          {INDUSTRIES.map((industry) => {
+            const Icon = industryIcons[industry.slug] ?? Briefcase
             return (
               <motion.div
                 key={industry.name}

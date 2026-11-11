@@ -3,7 +3,7 @@
 import { motion } from "framer-motion"
 import { ArrowLeft, ArrowRight, Check, ExternalLink, Quote, ChevronRight } from "lucide-react"
 import Link from "next/link"
-import { PROJECTS_DATA, type ProjectData } from "@/data/portfolio"
+import type { ProjectData } from "@/data/portfolio"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 
@@ -28,8 +28,8 @@ interface PortfolioDetailClientProps {
 }
 
 export default function PortfolioDetailClient({ slug, project: projectProp, relatedProjects: relatedProjectsProp }: PortfolioDetailClientProps) {
-  const project = projectProp !== undefined ? projectProp : PROJECTS_DATA.find((p) => p.slug === slug)
-  const relatedProjects = relatedProjectsProp ?? (project ? PROJECTS_DATA.filter((p) => p.category === project.category && p.slug !== project.slug).slice(0, 3) : [])
+  const project = projectProp !== undefined ? projectProp : null
+  const relatedProjects = relatedProjectsProp ?? []
 
   if (!project) {
     return (
