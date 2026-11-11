@@ -8,6 +8,21 @@ export async function getSettings() {
   return prisma.siteSettings.findFirst()
 }
 
+export async function getPublicSettings() {
+  const settings = await prisma.siteSettings.findFirst()
+  if (!settings) return null
+  return {
+    siteName: settings.siteName,
+    contactEmail: settings.contactEmail,
+    officeAddress: settings.officeAddress,
+    officePhone: settings.officePhone,
+    linkedin: settings.linkedin,
+    twitter: settings.twitter,
+    github: settings.github,
+    youtube: settings.youtube,
+  }
+}
+
 const updateSettingsSchema = z.object({
   siteName: z.string().min(1).optional(),
   siteDescription: z.string().optional(),

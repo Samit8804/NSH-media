@@ -3,6 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { signOut } from "next-auth/react"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   LayoutDashboard,
@@ -67,6 +68,7 @@ function SidebarContent({ pathname, onNavClick }: { pathname: string; onNavClick
         <Button
           variant="ghost"
           className="w-full justify-start text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+          onClick={() => signOut({ callbackUrl: "/auth/login" })}
         >
           <LogOut className="h-5 w-5 mr-3" />
           Logout

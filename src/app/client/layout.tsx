@@ -2,12 +2,20 @@
 
 import { ReactNode } from "react"
 import ClientSidebar from "@/components/client/ClientSidebar"
-import { Bell, Search } from "lucide-react"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
+import { useSession } from "next-auth/react"
 
 export default function ClientLayout({ children }: { children: ReactNode }) {
+  const { data: session } = useSession()
+  const user = session?.user as { name?: string | null; email?: string | null } | undefined
+  const displayName = user?.name || user?.email || "Client"
+  const initials = displayName
+    .split(" ")
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase()
+
   return (
     <div className="flex h-screen bg-background">
       <ClientSidebar />
@@ -18,26 +26,12 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
             <span className="text-sm font-semibold text-muted-foreground">Client Portal</span>
           </div>
 
-          <div className="hidden lg:flex items-center relative max-w-md w-full">
-            <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Search..."
-              className="pl-9 h-9 bg-muted border-none"
-            />
-          </div>
-
-          <div className="flex items-center gap-2 ml-auto">
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="h-5 w-5" />
-              <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-destructive text-destructive-foreground text-[10px] font-medium flex items-center justify-center">
-                3
-              </span>
-            </Button>
+          <div className="ml-auto flex items-center gap-2">
             <div className="flex items-center gap-2 ml-2">
               <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
-                <span className="text-xs font-semibold text-primary">JD</span>
+                <span className="text-xs font-semibold text-primary">{initials || "C"}</span>
               </div>
-              <span className="hidden lg:block text-sm font-medium text-foreground">John Doe</span>
+              <span className="hidden lg:block text-sm font-medium text-foreground">{displayName}</span>
             </div>
           </div>
         </header>

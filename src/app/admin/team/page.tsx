@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { Plus, Edit3, Trash2, Linkedin, Twitter, ImageIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -16,9 +16,15 @@ import {
 } from "@/components/ui/dialog"
 import Image from "next/image"
 import MediaPicker from "@/components/admin/MediaPicker"
+import {
+  getTeamMembers,
+  createTeamMember,
+  updateTeamMember,
+  deleteTeamMember,
+} from "@/actions/team"
 
 interface TeamMember {
-  id: number
+  id: string
   name: string
   position: string
   bio: string
@@ -27,14 +33,8 @@ interface TeamMember {
   twitter: string
 }
 
-const initialTeam: TeamMember[] = [
-  { id: 1, name: "John Doe", position: "CEO & Founder", bio: "Visionary leader with 15+ years in digital media and marketing.", imageUrl: "", linkedin: "https://linkedin.com/in/johndoe", twitter: "https://twitter.com/johndoe" },
-  { id: 2, name: "Sarah Lee", position: "Creative Director", bio: "Award-winning designer passionate about user-centered design.", imageUrl: "", linkedin: "https://linkedin.com/in/sarahlee", twitter: "" },
-  { id: 3, name: "Mike Chen", position: "Lead Developer", bio: "Full-stack developer specializing in React and Node.js ecosystems.", imageUrl: "", linkedin: "", twitter: "https://twitter.com/mikechen" },
-]
-
 const emptyForm: TeamMember = {
-  id: 0,
+  id: "",
   name: "",
   position: "",
   bio: "",
@@ -44,37 +44,84 @@ const emptyForm: TeamMember = {
 }
 
 export default function TeamPage() {
-  const [team, setTeam] = useState<TeamMember[]>(initialTeam)
+  const [team, setTeam] = useState<TeamMember[]>([])
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [deleteId, setDeleteId] = useState<number | null>(null)
+  const [deleteId, setDeleteId] = useState<string | null>(null)
   const [form, setForm] = useState<TeamMember>(emptyForm)
   const [editing, setEditing] = useState(false)
   const [showPicker, setShowPicker] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    getTeamMembers()
+      .then((data) => {
+        const list = (data as unknown as Array<Record<string, unknown>>) || []
+        setTeam(
+          list.map((m) => ({
+            id: m.id as string,
+            name: (m.name as string) ?? "",
+            position: (m.position as string) ?? "",
+            bio: (m.bio as string) ?? "",
+            imageUrl: (m.image as string) ?? "",
+            linkedin: (m.linkedin as string) ?? "",
+            twitter: (m.twitter as string) ?? "",
+          }))
+        )
+      })
+      .catch(() => setTeam([]))
+  }, [])
 
   const openEdit = (m: TeamMember) => {
     setForm(m)
     setEditing(true)
+    setError(null)
     setDialogOpen(true)
   }
 
   const openNew = () => {
-    setForm({ ...emptyForm, id: Date.now() })
+    setForm({ ...emptyForm })
     setEditing(false)
+    setError(null)
     setDialogOpen(true)
   }
 
-  const save = () => {
-    if (editing) {
-      setTeam(team.map((m) => (m.id === form.id ? form : m)))
-    } else {
-      setTeam([...team, form])
+  const save = async () => {
+    if (!form.name.trim() || !form.position.trim()) {
+      setError("Name and position are required.")
+      return
     }
-    setDialogOpen(false)
+    setError(null)
+    const payload = {
+      name: form.name.trim(),
+      position: form.position.trim(),
+      bio: form.bio.trim() || undefined,
+      image: form.imageUrl.trim() || undefined,
+      linkedin: form.linkedin.trim() || undefined,
+      twitter: form.twitter.trim() || undefined,
+    }
+    try {
+      if (editing) {
+        await updateTeamMember(form.id, payload)
+        setTeam(team.map((m) => (m.id === form.id ? form : m)))
+      } else {
+        const created = await createTeamMember(payload)
+        setTeam([{ ...form, id: created.id }, ...team])
+      }
+      setDialogOpen(false)
+    } catch (err) {
+      console.error("Failed to save team member:", err)
+      setError("Failed to save the team member. Please try again.")
+    }
   }
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (deleteId !== null) {
-      setTeam(team.filter((m) => m.id !== deleteId))
+      try {
+        await deleteTeamMember(deleteId)
+        setTeam(team.filter((m) => m.id !== deleteId))
+      } catch (err) {
+        console.error("Failed to delete team member:", err)
+      }
       setDeleteId(null)
     }
   }
@@ -94,17 +141,17 @@ export default function TeamPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-white/10 text-left text-silver text-xs uppercase tracking-wider">
-                <th className="pb-3 font-medium">Name</th>
+                <th className="px-6 pb-3 font-medium">Name</th>
                 <th className="pb-3 font-medium">Position</th>
                 <th className="pb-3 font-medium">LinkedIn</th>
                 <th className="pb-3 font-medium">Twitter</th>
-                <th className="pb-3 font-medium text-right">Actions</th>
+                <th className="pb-3 pr-6 font-medium text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
               {team.map((m, i) => (
                 <motion.tr key={m.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="border-b border-white/10 last:border-0 hover:bg-white/[0.04]">
-                  <td className="py-3 font-medium text-white">{m.name}</td>
+                  <td className="px-6 py-3 font-medium text-white">{m.name}</td>
                   <td className="py-3 text-silver">{m.position}</td>
                   <td className="py-3">
                     {m.linkedin ? (
@@ -124,7 +171,7 @@ export default function TeamPage() {
                       <span className="text-white/40">-</span>
                     )}
                   </td>
-                  <td className="py-3 text-right">
+                  <td className="py-3 pr-6 text-right">
                     <div className="flex items-center justify-end gap-1">
                       <button onClick={() => openEdit(m)} className="p-2 text-silver hover:text-primary hover:bg-white/[0.04] rounded-lg"><Edit3 className="h-4 w-4" /></button>
                       <button onClick={() => setDeleteId(m.id)} className="p-2 text-silver hover:text-red-400 hover:bg-red-500/10 rounded-lg"><Trash2 className="h-4 w-4" /></button>
@@ -132,6 +179,11 @@ export default function TeamPage() {
                   </td>
                 </motion.tr>
               ))}
+              {team.length === 0 && (
+                <tr>
+                  <td colSpan={5} className="px-6 py-8 text-center text-silver/40">No team members yet.</td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -188,6 +240,7 @@ export default function TeamPage() {
                 <Input value={form.twitter} onChange={(e) => setForm({ ...form, twitter: e.target.value })} />
               </div>
             </div>
+            {error && <p className="text-sm text-red-400">{error}</p>}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
@@ -196,7 +249,7 @@ export default function TeamPage() {
         </DialogContent>
       </Dialog>
 
-      <MediaPicker open={showPicker} onClose={() => setShowPicker(false)} onSelect={(url) => setForm({...form, imageUrl: url})} />
+      <MediaPicker open={showPicker} onClose={() => setShowPicker(false)} onSelect={(url) => setForm({ ...form, imageUrl: url })} />
 
       <Dialog open={deleteId !== null} onOpenChange={() => setDeleteId(null)}>
         <DialogContent className="glass-dashboard border-white/10">

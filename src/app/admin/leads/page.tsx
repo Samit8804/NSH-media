@@ -1,21 +1,34 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { Search, Download, ChevronDown, ChevronUp, MessageSquare } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { getLeads, updateLeadStatus, addLeadNote } from "@/actions/leads"
+
+type LeadStatus = "NEW" | "CONTACTED" | "QUALIFIED" | "PROPOSAL_SENT" | "WON" | "LOST" | "ARCHIVED"
 
 interface Lead {
-  id: number
+  id: string
   name: string
   email: string
   service: string
   budget: string
-  status: string
+  status: LeadStatus
   date: string
   message: string
   notes: string
+}
+
+const statusLabels: Record<LeadStatus, string> = {
+  NEW: "New",
+  CONTACTED: "Contacted",
+  QUALIFIED: "Qualified",
+  PROPOSAL_SENT: "Proposal Sent",
+  WON: "Won",
+  LOST: "Lost",
+  ARCHIVED: "Archived",
 }
 
 const tabs = ["All", "New", "Contacted", "Qualified", "Proposal Sent", "Won", "Lost", "Archived"]
@@ -29,16 +42,6 @@ const statusStyles: Record<string, string> = {
   Lost: "bg-red-500/10 text-red-400 border-red-500/20",
   Archived: "bg-white/5 text-silver/60 border-white/10",
 }
-
-const initialLeads: Lead[] = [
-  { id: 1, name: "Sarah Johnson", email: "sarah@example.com", service: "Web Development", budget: "$15,000 - $25,000", status: "New", date: "2026-06-24", message: "We need a complete website redesign for our company. Looking for a modern, responsive design with CMS integration.", notes: "" },
-  { id: 2, name: "Michael Chen", email: "michael@example.com", service: "UI/UX Design", budget: "$8,000 - $12,000", status: "Contacted", date: "2026-06-23", message: "Interested in improving our mobile app UX. Current app has poor user retention.", notes: "" },
-  { id: 3, name: "Emily Rodriguez", email: "emily@example.com", service: "SEO Optimization", budget: "$3,000 - $5,000", status: "Qualified", date: "2026-06-22", message: "Our organic traffic has been declining for 3 months. Need an SEO audit and strategy.", notes: "" },
-  { id: 4, name: "David Kim", email: "david@example.com", service: "Brand Strategy", budget: "$10,000 - $15,000", status: "Proposal Sent", date: "2026-06-21", message: "Starting a new business and need complete branding: logo, guidelines, and website.", notes: "" },
-  { id: 5, name: "Lisa Thompson", email: "lisa@example.com", service: "Social Media", budget: "$2,000 - $4,000", status: "New", date: "2026-06-20", message: "Looking for social media management for our Instagram and LinkedIn accounts.", notes: "" },
-  { id: 6, name: "James Wilson", email: "james@example.com", service: "Web Development", budget: "$20,000 - $30,000", status: "Won", date: "2026-06-18", message: "Need an e-commerce platform built from scratch with payment integration.", notes: "" },
-  { id: 7, name: "Anna Martinez", email: "anna@example.com", service: "Mobile App", budget: "$25,000 - $40,000", status: "Lost", date: "2026-06-15", message: "Fitness tracking app with social features.", notes: "" },
-]
 
 const months = [
   { value: "all", label: "All Months" },
@@ -57,24 +60,45 @@ const months = [
 ]
 
 export default function LeadsPage() {
-  const [leads, setLeads] = useState<Lead[]>(initialLeads)
+  const [leads, setLeads] = useState<Lead[]>([])
   const [search, setSearch] = useState("")
   const [activeTab, setActiveTab] = useState("All")
-  const [expandedId, setExpandedId] = useState<number | null>(null)
-  const [noteInputs, setNoteInputs] = useState<Record<number, string>>({})
+  const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [noteInputs, setNoteInputs] = useState<Record<string, string>>({})
   const [selectedMonth, setSelectedMonth] = useState("all")
+
+  useEffect(() => {
+    getLeads()
+      .then((data) => {
+        const list = (data as unknown as Array<Record<string, unknown>>) || []
+        setLeads(
+          list.map((l) => ({
+            id: l.id as string,
+            name: (l.name as string) ?? "",
+            email: (l.email as string) ?? "",
+            service: (l.service as string) ?? "",
+            budget: (l.budget as string) ?? "",
+            status: (l.status as LeadStatus) ?? "NEW",
+            date: l.createdAt ? new Date(l.createdAt as string).toISOString().slice(0, 10) : "",
+            message: (l.message as string) ?? "",
+            notes: (l.notes as string) ?? "",
+          }))
+        )
+      })
+      .catch(() => setLeads([]))
+  }, [])
 
   const filtered = leads.filter((lead) => {
     const q = search.toLowerCase()
     const matchesSearch = lead.name.toLowerCase().includes(q) || lead.email.toLowerCase().includes(q)
-    const matchesTab = activeTab === "All" || lead.status === activeTab
+    const matchesTab = activeTab === "All" || statusLabels[lead.status] === activeTab
     const matchesMonth = selectedMonth === "all" || lead.date.slice(5, 7) === selectedMonth
     return matchesSearch && matchesTab && matchesMonth
   })
 
   const exportCSV = () => {
     const headers = ["Name", "Email", "Service", "Budget", "Status", "Date", "Message"]
-    const rows = filtered.map((l) => [l.name, l.email, l.service, l.budget, l.status, l.date, `"${l.message}"`])
+    const rows = filtered.map((l) => [l.name, l.email, l.service, l.budget, statusLabels[l.status], l.date, `"${l.message}"`])
     const csv = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n")
     const blob = new Blob([csv], { type: "text/csv" })
     const url = URL.createObjectURL(blob)
@@ -85,11 +109,27 @@ export default function LeadsPage() {
     URL.revokeObjectURL(url)
   }
 
-  const addNote = (id: number) => {
+  const changeStatus = async (id: string, status: LeadStatus) => {
+    setLeads(leads.map((l) => (l.id === id ? { ...l, status } : l)))
+    try {
+      await updateLeadStatus(id, status)
+    } catch (err) {
+      console.error("Failed to update lead status:", err)
+    }
+  }
+
+  const addNote = async (id: string) => {
     const note = noteInputs[id]
-    if (note?.trim()) {
-      setLeads(leads.map((l) => (l.id === id ? { ...l, notes: l.notes + (l.notes ? "\n" : "") + note } : l)))
-      setNoteInputs({ ...noteInputs, [id]: "" })
+    if (!note?.trim()) return
+    const lead = leads.find((l) => l.id === id)
+    if (!lead) return
+    const nextNotes = lead.notes + (lead.notes ? "\n" : "") + note
+    setLeads(leads.map((l) => (l.id === id ? { ...l, notes: nextNotes } : l)))
+    setNoteInputs({ ...noteInputs, [id]: "" })
+    try {
+      await addLeadNote(id, note)
+    } catch (err) {
+      console.error("Failed to add lead note:", err)
     }
   }
 
@@ -177,8 +217,8 @@ export default function LeadsPage() {
                   <td className="p-4 text-silver/60">{lead.service}</td>
                   <td className="p-4 text-silver/60">{lead.budget}</td>
                   <td className="p-4">
-                    <span className={cn("inline-flex px-2.5 py-0.5 rounded-full text-[11px] font-medium border", statusStyles[lead.status])}>
-                      {lead.status}
+                    <span className={cn("inline-flex px-2.5 py-0.5 rounded-full text-[11px] font-medium border", statusStyles[statusLabels[lead.status]])}>
+                      {statusLabels[lead.status]}
                     </span>
                   </td>
                   <td className="p-4 text-silver/50 text-xs">{lead.date}</td>
@@ -215,6 +255,20 @@ export default function LeadsPage() {
                 <div>
                   <h4 className="text-xs font-semibold text-silver/50 uppercase tracking-wider mb-2">Message</h4>
                   <p className="text-sm text-silver/80 leading-relaxed">{lead.message}</p>
+                  <div className="mt-4">
+                    <h4 className="text-xs font-semibold text-silver/50 uppercase tracking-wider mb-2">Status</h4>
+                    <select
+                      value={lead.status}
+                      onChange={(e) => changeStatus(lead.id, e.target.value as LeadStatus)}
+                      className="rounded-xl bg-white/[0.04] border border-white/5 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    >
+                      {(Object.keys(statusLabels) as LeadStatus[]).map((status) => (
+                        <option key={status} value={status} className="bg-[#020617] text-white">
+                          {statusLabels[status]}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
                 <div>
                   <h4 className="text-xs font-semibold text-silver/50 uppercase tracking-wider mb-2">Notes</h4>

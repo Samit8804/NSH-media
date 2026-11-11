@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useSession } from "next-auth/react"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
 import {
@@ -46,6 +47,15 @@ interface AdminSidebarProps {
 
 export default function AdminSidebar({ open, onClose }: AdminSidebarProps) {
   const pathname = usePathname()
+  const { data: session } = useSession()
+  const user = session?.user as { name?: string | null; email?: string | null } | undefined
+  const displayName = user?.name || user?.email || "Admin"
+  const initials = displayName
+    .split(" ")
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase()
 
   const sidebarContent = (
     <div className="flex h-full flex-col glass-nav border-r border-white/5">
@@ -103,13 +113,13 @@ export default function AdminSidebar({ open, onClose }: AdminSidebarProps) {
         <div className="flex items-center gap-3 rounded-xl bg-white/[0.04] px-3 py-2.5 border border-white/5">
           <div className="relative">
             <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-xs font-semibold shadow-lg">
-              JD
+              {initials || "A"}
             </div>
             <div className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-green-500 border-2 border-[#020617]" />
           </div>
           <div className="flex-1 min-w-0">
-            <div className="text-sm font-medium text-white truncate">John Doe</div>
-            <div className="text-xs text-silver truncate">admin@nshmedia.com</div>
+            <div className="text-sm font-medium text-white truncate">{displayName}</div>
+            <div className="text-xs text-silver truncate">{user?.email || ""}</div>
           </div>
         </div>
       </div>

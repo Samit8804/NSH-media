@@ -11,6 +11,12 @@ export async function getServices() {
   })
 }
 
+export async function getAllServices() {
+  return prisma.service.findMany({
+    orderBy: { createdAt: "desc" },
+  })
+}
+
 export async function getServiceBySlug(slug: string) {
   return prisma.service.findUnique({
     where: { slug },

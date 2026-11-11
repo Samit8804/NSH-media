@@ -11,6 +11,12 @@ export async function getFAQs() {
   })
 }
 
+export async function getAllFAQs() {
+  return prisma.fAQ.findMany({
+    orderBy: [{ order: "asc" }, { createdAt: "desc" }],
+  })
+}
+
 const createFAQSchema = z.object({
   question: z.string().min(1),
   answer: z.string().min(1),

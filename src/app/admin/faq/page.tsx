@@ -1,13 +1,19 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { Plus, Edit3, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import {
+  getAllFAQs,
+  createFAQ,
+  updateFAQ,
+  deleteFAQ,
+} from "@/actions/faqs"
 
 interface FAQ {
-  id: number
+  id: string
   question: string
   answer: string
   category: string
@@ -15,26 +21,76 @@ interface FAQ {
   published: boolean
 }
 
-const initialFAQs: FAQ[] = [
-  { id: 1, question: "What services does NSH Media offer?", answer: "We offer web development, UI/UX design, SEO optimization, social media management, and brand strategy services.", category: "General", order: 1, published: true },
-  { id: 2, question: "How long does a typical project take?", answer: "Project timelines vary based on scope. A typical website takes 4-8 weeks, while larger projects can take 3-6 months.", category: "Process", order: 1, published: true },
-  { id: 3, question: "What is your pricing model?", answer: "We offer project-based pricing with transparent quotes. Contact us for a free consultation and estimate.", category: "Pricing", order: 1, published: true },
-  { id: 4, question: "Do you offer post-launch support?", answer: "Yes, we offer maintenance and support packages to keep your website running smoothly after launch.", category: "Support", order: 1, published: false },
-]
-
-const emptyForm: FAQ = { id: 0, question: "", answer: "", category: "General", order: 0, published: true }
+const emptyForm: FAQ = { id: "", question: "", answer: "", category: "General", order: 0, published: true }
 
 export default function FAQPage() {
-  const [faqs, setFaqs] = useState<FAQ[]>(initialFAQs)
+  const [faqs, setFaqs] = useState<FAQ[]>([])
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [deleteId, setDeleteId] = useState<number | null>(null)
+  const [deleteId, setDeleteId] = useState<string | null>(null)
   const [form, setForm] = useState<FAQ>(emptyForm)
   const [editing, setEditing] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const openEdit = (f: FAQ) => { setForm(f); setEditing(true); setDialogOpen(true) }
-  const openNew = () => { setForm({ ...emptyForm, id: Date.now(), order: faqs.length + 1 }); setEditing(false); setDialogOpen(true) }
-  const save = () => { setFaqs(editing ? faqs.map((f) => (f.id === form.id ? form : f)) : [...faqs, form]); setDialogOpen(false) }
-  const handleDelete = () => { if (deleteId !== null) { setFaqs(faqs.filter((f) => f.id !== deleteId)); setDeleteId(null) } }
+  useEffect(() => {
+    getAllFAQs()
+      .then((data) => {
+        const list = (data as unknown as Array<Record<string, unknown>>) || []
+        setFaqs(
+          list.map((f) => ({
+            id: f.id as string,
+            question: (f.question as string) ?? "",
+            answer: (f.answer as string) ?? "",
+            category: (f.category as string) ?? "General",
+            order: (f.order as number) ?? 0,
+            published: (f.published as boolean) ?? false,
+          }))
+        )
+      })
+      .catch(() => setFaqs([]))
+  }, [])
+
+  const openEdit = (f: FAQ) => { setForm(f); setEditing(true); setError(null); setDialogOpen(true) }
+  const openNew = () => { setForm({ ...emptyForm, order: faqs.length + 1 }); setEditing(false); setError(null); setDialogOpen(true) }
+
+  const save = async () => {
+    if (!form.question.trim() || !form.answer.trim()) {
+      setError("Question and answer are required.")
+      return
+    }
+    setError(null)
+    const payload = {
+      question: form.question.trim(),
+      answer: form.answer.trim(),
+      category: form.category.trim() || "General",
+      order: form.order,
+      published: form.published,
+    }
+    try {
+      if (editing) {
+        await updateFAQ(form.id, payload)
+        setFaqs(faqs.map((f) => (f.id === form.id ? form : f)))
+      } else {
+        const created = await createFAQ(payload)
+        setFaqs([...faqs, { ...form, id: created.id }])
+      }
+      setDialogOpen(false)
+    } catch (err) {
+      console.error("Failed to save FAQ:", err)
+      setError("Failed to save the FAQ. Please try again.")
+    }
+  }
+
+  const handleDelete = async () => {
+    if (deleteId !== null) {
+      try {
+        await deleteFAQ(deleteId)
+        setFaqs(faqs.filter((f) => f.id !== deleteId))
+      } catch (err) {
+        console.error("Failed to delete FAQ:", err)
+      }
+      setDeleteId(null)
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -81,6 +137,11 @@ export default function FAQPage() {
                   </td>
                 </motion.tr>
               ))}
+              {faqs.length === 0 && (
+                <tr>
+                  <td colSpan={5} className="p-8 text-center text-silver/40">No FAQs yet. Add your first one.</td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -116,6 +177,7 @@ export default function FAQPage() {
               <input type="checkbox" checked={form.published} onChange={(e) => setForm({ ...form, published: e.target.checked })} className="rounded border-white/20 bg-white/[0.04]" />
               Published
             </label>
+            {error && <p className="text-sm text-red-400">{error}</p>}
             <div className="flex gap-3 justify-end pt-2">
               <Button variant="secondary" onClick={() => setDialogOpen(false)}>Cancel</Button>
               <Button onClick={save}>Save</Button>
@@ -124,7 +186,7 @@ export default function FAQPage() {
         </div>
       )}
 
-      {deleteId && (
+      {deleteId !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setDeleteId(null)}>
           <div className="glass-dashboard p-6 max-w-sm w-full mx-4" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-lg font-semibold text-white mb-2">Delete FAQ</h3>

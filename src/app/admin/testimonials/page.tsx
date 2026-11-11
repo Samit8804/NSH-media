@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { Plus, Edit3, Trash2, Star } from "lucide-react"
@@ -15,66 +15,115 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import {
+  getAllTestimonials,
+  createTestimonial,
+  updateTestimonial,
+  deleteTestimonial,
+} from "@/actions/testimonials"
 
 interface Testimonial {
-  id: number
+  id: string
   name: string
   company: string
   role: string
   content: string
   rating: number
-  photoUrl: string
+  photo: string
   published: boolean
 }
 
-const initialTestimonials: Testimonial[] = [
-  { id: 1, name: "Sarah Johnson", company: "TechFlow Inc.", role: "CEO", content: "NSH Media transformed our online presence. Our traffic increased by 300% in just 3 months!", rating: 5, photoUrl: "", published: true },
-  { id: 2, name: "Michael Chen", company: "GreenLeaf Co.", role: "Marketing Director", content: "The team delivered beyond our expectations. Professional, creative, and results-driven.", rating: 5, photoUrl: "", published: true },
-  { id: 3, name: "Emily Rodriguez", company: "UrbanEats", role: "Founder", content: "Working with NSH Media was a game-changer. Our sales grew by 150% after the rebrand.", rating: 4, photoUrl: "", published: false },
-]
-
 const emptyForm: Testimonial = {
-  id: 0,
+  id: "",
   name: "",
   company: "",
   role: "",
   content: "",
   rating: 5,
-  photoUrl: "",
+  photo: "",
   published: true,
 }
 
 export default function TestimonialsPage() {
-  const [testimonials, setTestimonials] = useState<Testimonial[]>(initialTestimonials)
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([])
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [deleteId, setDeleteId] = useState<number | null>(null)
+  const [deleteId, setDeleteId] = useState<string | null>(null)
   const [form, setForm] = useState<Testimonial>(emptyForm)
   const [editing, setEditing] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    getAllTestimonials()
+      .then((data) => {
+        const list = (data as unknown as Array<Record<string, unknown>>) || []
+        setTestimonials(
+          list.map((t) => ({
+            id: t.id as string,
+            name: (t.name as string) ?? "",
+            company: (t.company as string) ?? "",
+            role: (t.role as string) ?? "",
+            content: (t.content as string) ?? "",
+            rating: (t.rating as number) ?? 5,
+            photo: (t.photo as string) ?? "",
+            published: (t.published as boolean) ?? false,
+          }))
+        )
+      })
+      .catch(() => setTestimonials([]))
+  }, [])
 
   const openEdit = (t: Testimonial) => {
     setForm(t)
     setEditing(true)
+    setError(null)
     setDialogOpen(true)
   }
 
   const openNew = () => {
-    setForm({ ...emptyForm, id: Date.now() })
+    setForm({ ...emptyForm })
     setEditing(false)
+    setError(null)
     setDialogOpen(true)
   }
 
-  const save = () => {
-    if (editing) {
-      setTestimonials(testimonials.map((t) => (t.id === form.id ? form : t)))
-    } else {
-      setTestimonials([...testimonials, form])
+  const save = async () => {
+    if (!form.name.trim() || !form.company.trim() || !form.content.trim()) {
+      setError("Name, company and content are required.")
+      return
     }
-    setDialogOpen(false)
+    setError(null)
+    try {
+      const payload = {
+        name: form.name.trim(),
+        company: form.company.trim(),
+        role: form.role.trim() || undefined,
+        photo: form.photo.trim() || undefined,
+        content: form.content.trim(),
+        rating: form.rating,
+        published: form.published,
+      }
+      if (editing) {
+        await updateTestimonial(form.id, payload)
+        setTestimonials(testimonials.map((t) => (t.id === form.id ? form : t)))
+      } else {
+        const created = await createTestimonial(payload)
+        setTestimonials([{ ...form, id: created.id }, ...testimonials])
+      }
+      setDialogOpen(false)
+    } catch (err) {
+      console.error("Failed to save testimonial:", err)
+      setError("Failed to save the testimonial. Please try again.")
+    }
   }
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (deleteId !== null) {
-      setTestimonials(testimonials.filter((t) => t.id !== deleteId))
+      try {
+        await deleteTestimonial(deleteId)
+        setTestimonials(testimonials.filter((t) => t.id !== deleteId))
+      } catch (err) {
+        console.error("Failed to delete testimonial:", err)
+      }
       setDeleteId(null)
     }
   }
@@ -94,17 +143,17 @@ export default function TestimonialsPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-white/10 text-left text-silver text-xs uppercase tracking-wider">
-                <th className="pb-3 font-medium">Name</th>
+                <th className="px-6 pb-3 font-medium">Name</th>
                 <th className="pb-3 font-medium">Company</th>
                 <th className="pb-3 font-medium">Rating</th>
                 <th className="pb-3 font-medium">Published</th>
-                <th className="pb-3 font-medium text-right">Actions</th>
+                <th className="pb-3 pr-6 font-medium text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
               {testimonials.map((t, i) => (
                 <motion.tr key={t.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="border-b border-white/10 last:border-0 hover:bg-white/[0.04]">
-                  <td className="py-3 font-medium text-white">{t.name}</td>
+                  <td className="px-6 py-3 font-medium text-white">{t.name}</td>
                   <td className="py-3 text-silver">{t.company}</td>
                   <td className="py-3">
                     <div className="flex items-center gap-0.5">
@@ -118,7 +167,7 @@ export default function TestimonialsPage() {
                       {t.published ? "Yes" : "No"}
                     </span>
                   </td>
-                  <td className="py-3 text-right">
+                  <td className="py-3 pr-6 text-right">
                     <div className="flex items-center justify-end gap-1">
                       <button onClick={() => openEdit(t)} className="p-2 text-silver hover:text-primary hover:bg-white/[0.04] rounded-lg"><Edit3 className="h-4 w-4" /></button>
                       <button onClick={() => setDeleteId(t.id)} className="p-2 text-silver hover:text-red-400 hover:bg-red-500/10 rounded-lg"><Trash2 className="h-4 w-4" /></button>
@@ -126,6 +175,11 @@ export default function TestimonialsPage() {
                   </td>
                 </motion.tr>
               ))}
+              {testimonials.length === 0 && (
+                <tr>
+                  <td colSpan={5} className="px-6 py-8 text-center text-slate-400">No testimonials yet. Add your first one.</td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -154,7 +208,7 @@ export default function TestimonialsPage() {
               </div>
               <div className="space-y-2">
                 <Label className="text-silver">Photo URL</Label>
-                <Input value={form.photoUrl} onChange={(e) => setForm({ ...form, photoUrl: e.target.value })} />
+                <Input value={form.photo} onChange={(e) => setForm({ ...form, photo: e.target.value })} />
               </div>
             </div>
             <div className="space-y-2">
@@ -175,6 +229,7 @@ export default function TestimonialsPage() {
               <input type="checkbox" checked={form.published} onChange={(e) => setForm({ ...form, published: e.target.checked })} className="rounded border-white/20" />
               Published
             </label>
+            {error && <p className="text-sm text-red-400">{error}</p>}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>

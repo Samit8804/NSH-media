@@ -11,6 +11,12 @@ export async function getTestimonials() {
   })
 }
 
+export async function getAllTestimonials() {
+  return prisma.testimonial.findMany({
+    orderBy: { createdAt: "desc" },
+  })
+}
+
 const createTestimonialSchema = z.object({
   name: z.string().min(1),
   company: z.string().min(1),

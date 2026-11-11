@@ -11,6 +11,12 @@ export async function getPricingPlans() {
   })
 }
 
+export async function getAllPricingPlans() {
+  return prisma.pricing.findMany({
+    orderBy: { createdAt: "desc" },
+  })
+}
+
 const updatePricingPlanSchema = z.object({
   name: z.string().min(1).optional(),
   slug: z.string().min(1).optional(),

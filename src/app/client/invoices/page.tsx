@@ -1,28 +1,30 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import {
-  Download,
-  Eye,
   DollarSign,
-  TrendingUp,
   AlertCircle,
   CheckCircle2,
 } from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { getClientInvoices } from "@/actions/client-portal"
 
-const invoices = [
-  { id: "INV-0043", amount: "$4,500.00", status: "Pending", dueDate: "Apr 15, 2026", project: "Website Redesign" },
-  { id: "INV-0042", amount: "$3,500.00", status: "Paid", dueDate: "Mar 01, 2026", project: "SEO Campaign" },
-  { id: "INV-0041", amount: "$2,800.00", status: "Overdue", dueDate: "Feb 15, 2026", project: "Social Media Package" },
-  { id: "INV-0040", amount: "$5,200.00", status: "Paid", dueDate: "Jan 30, 2026", project: "Brand Identity" },
-  { id: "INV-0039", amount: "$1,950.00", status: "Paid", dueDate: "Jan 10, 2026", project: "Website Redesign" },
-  { id: "INV-0038", amount: "$3,200.00", status: "Pending", dueDate: "Apr 01, 2026", project: "Email Marketing" },
-  { id: "INV-0037", amount: "$4,100.00", status: "Paid", dueDate: "Dec 20, 2025", project: "Mobile App UI" },
-]
+interface Invoice {
+  id: string
+  amount: number
+  status: "PENDING" | "PAID" | "OVERDUE"
+  dueDate: string
+  createdAt: string
+}
+
+const statusLabels: Record<Invoice["status"], string> = {
+  PAID: "Paid",
+  PENDING: "Pending",
+  OVERDUE: "Overdue",
+}
 
 const statusStyles: Record<string, string> = {
   Paid: "bg-green-100 text-green-700 border-green-200",
@@ -44,15 +46,25 @@ const itemVariants = {
 }
 
 export default function ClientInvoices() {
+  const [invoices, setInvoices] = useState<Invoice[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    getClientInvoices()
+      .then((data) => setInvoices(data as unknown as Invoice[]))
+      .catch(() => setInvoices([]))
+      .finally(() => setLoading(false))
+  }, [])
+
   const totalPaid = invoices
-    .filter((inv) => inv.status === "Paid")
-    .reduce((sum, inv) => sum + parseFloat(inv.amount.replace(/[$,]/g, "")), 0)
+    .filter((inv) => inv.status === "PAID")
+    .reduce((sum, inv) => sum + inv.amount, 0)
   const totalPending = invoices
-    .filter((inv) => inv.status !== "Paid")
-    .reduce((sum, inv) => sum + parseFloat(inv.amount.replace(/[$,]/g, "")), 0)
+    .filter((inv) => inv.status !== "PAID")
+    .reduce((sum, inv) => sum + inv.amount, 0)
   const totalBalance = invoices
-    .filter((inv) => inv.status === "Pending" || inv.status === "Overdue")
-    .reduce((sum, inv) => sum + parseFloat(inv.amount.replace(/[$,]/g, "")), 0)
+    .filter((inv) => inv.status === "PENDING" || inv.status === "OVERDUE")
+    .reduce((sum, inv) => sum + inv.amount, 0)
 
   return (
     <motion.div
@@ -112,48 +124,48 @@ export default function ClientInvoices() {
       <Card className="border-border">
         <CardContent className="p-0">
           <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-3 border-b border-border bg-muted/50 text-xs font-medium text-muted-foreground uppercase tracking-wider">
-            <div className="col-span-2">Invoice</div>
-            <div className="col-span-2">Project</div>
-            <div className="col-span-2">Amount</div>
-            <div className="col-span-2">Status</div>
-            <div className="col-span-2">Due Date</div>
-            <div className="col-span-2 text-right">Actions</div>
+            <div className="col-span-3">Invoice</div>
+            <div className="col-span-3">Amount</div>
+            <div className="col-span-3">Status</div>
+            <div className="col-span-3">Due Date</div>
           </div>
 
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            {invoices.map((inv) => (
-              <motion.div
-                key={inv.id}
-                variants={itemVariants}
-                className="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4 px-6 py-4 border-b border-border last:border-0 hover:bg-accent/50 transition-colors items-start md:items-center"
-              >
-                <div className="col-span-2">
-                  <p className="text-sm font-medium text-foreground">{inv.id}</p>
-                  <p className="text-xs text-muted-foreground md:hidden">{inv.project}</p>
-                </div>
-                <div className="hidden md:block col-span-2 text-sm text-muted-foreground">{inv.project}</div>
-                <div className="col-span-2 text-sm font-medium text-foreground">{inv.amount}</div>
-                <div className="col-span-2">
-                  <Badge variant="outline" className={cn(statusStyles[inv.status])}>
-                    {inv.status}
-                  </Badge>
-                </div>
-                <div className="col-span-2 text-sm text-muted-foreground">{inv.dueDate}</div>
-                <div className="col-span-2 flex justify-end gap-1">
-                  <Button variant="ghost" size="icon">
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon">
-                    <Download className="h-4 w-4" />
-                  </Button>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
+          {loading ? (
+            <div className="flex items-center justify-center h-40">
+              <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+            </div>
+          ) : invoices.length === 0 ? (
+            <div className="px-6 py-12 text-center text-sm text-muted-foreground">
+              No invoices have been issued to your account yet.
+            </div>
+          ) : (
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+            >
+              {invoices.map((inv) => (
+                <motion.div
+                  key={inv.id}
+                  variants={itemVariants}
+                  className="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4 px-6 py-4 border-b border-border last:border-0 hover:bg-accent/50 transition-colors items-start md:items-center"
+                >
+                  <div className="col-span-3">
+                    <p className="text-sm font-medium text-foreground">INV-{inv.id.slice(-6).toUpperCase()}</p>
+                  </div>
+                  <div className="col-span-3 text-sm font-medium text-foreground">${inv.amount.toLocaleString()}</div>
+                  <div className="col-span-3">
+                    <Badge variant="outline" className={cn(statusStyles[statusLabels[inv.status]])}>
+                      {statusLabels[inv.status]}
+                    </Badge>
+                  </div>
+                  <div className="col-span-3 text-sm text-muted-foreground">
+                    {new Date(inv.dueDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
         </CardContent>
       </Card>
     </motion.div>

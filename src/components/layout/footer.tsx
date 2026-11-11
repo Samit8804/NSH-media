@@ -1,9 +1,11 @@
 "use client"
 
 import Link from "next/link"
+import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import { Linkedin, Twitter, Github, Youtube, ArrowRight, Mail, Phone, MapPin } from "lucide-react"
 import ObfuscatedEmail from "@/components/ui/ObfuscatedEmail"
+import { getPublicSettings } from "@/actions/settings"
 
 const services = [
   { label: "Web Design", href: "/services/web-design" },
@@ -30,13 +32,6 @@ const resources = [
   { label: "Refund Policy", href: "/refund-policy" },
 ]
 
-const socialLinks = [
-  { label: "LinkedIn", href: "#", icon: Linkedin },
-  { label: "Twitter", href: "#", icon: Twitter },
-  { label: "GitHub", href: "#", icon: Github },
-  { label: "YouTube", href: "#", icon: Youtube },
-]
-
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
@@ -52,6 +47,20 @@ const itemVariants = {
 
 export default function Footer() {
   const currentYear = new Date().getFullYear()
+  const [settings, setSettings] = useState<Awaited<ReturnType<typeof getPublicSettings>>>(null)
+
+  useEffect(() => {
+    getPublicSettings().then(setSettings).catch(() => setSettings(null))
+  }, [])
+
+  const contactEmail = settings?.contactEmail || "nshmediaservice@gmail.com"
+
+  const socialLinks = [
+    { label: "LinkedIn", href: settings?.linkedin, icon: Linkedin },
+    { label: "Twitter", href: settings?.twitter, icon: Twitter },
+    { label: "GitHub", href: settings?.github, icon: Github },
+    { label: "YouTube", href: settings?.youtube, icon: Youtube },
+  ].filter((social): social is { label: string; href: string; icon: typeof Linkedin } => Boolean(social.href))
 
   return (
     <footer className="bg-dark-bg">
@@ -159,29 +168,32 @@ export default function Footer() {
               <p className="mt-3 text-sm text-silver">
                 Get the latest news and insights delivered to your inbox.
               </p>
-              <div className="mt-5 flex">
-                <input
-                  type="email"
-                  placeholder="your@email.com"
-                  className="w-full rounded-l-[14px] border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-silver/50 outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary"
-                />
-                <button className="flex shrink-0 items-center justify-center rounded-r-[14px] bg-primary px-4 text-white transition-all hover:bg-primary-hover">
+              <div className="mt-5">
+                <Link
+                  href="/blog"
+                  className="inline-flex items-center gap-2 text-sm font-semibold text-primary transition-all hover:gap-3"
+                >
+                  Read our latest insights
                   <ArrowRight className="h-4 w-4" />
-                </button>
+                </Link>
               </div>
               <div className="mt-8 space-y-4">
                 <div className="flex items-start gap-3 text-sm text-silver">
                   <Mail className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                  <ObfuscatedEmail email="contact@nshmedia.com" />
+                  <ObfuscatedEmail email={contactEmail} />
                 </div>
-                <div className="flex items-start gap-3 text-sm text-silver">
-                  <Phone className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                  <span>+1 (555) 123-4567</span>
-                </div>
-                <div className="flex items-start gap-3 text-sm text-silver">
-                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                  <span>123 Digital Ave, Tech City, TC 10001</span>
-                </div>
+                {settings?.officePhone && (
+                  <div className="flex items-start gap-3 text-sm text-silver">
+                    <Phone className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                    <span>{settings.officePhone}</span>
+                  </div>
+                )}
+                {settings?.officeAddress && (
+                  <div className="flex items-start gap-3 text-sm text-silver">
+                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                    <span>{settings.officeAddress}</span>
+                  </div>
+                )}
               </div>
             </motion.div>
           </div>
