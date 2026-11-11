@@ -12,6 +12,7 @@ export async function getFAQs() {
 }
 
 export async function getAllFAQs() {
+  await requireRole(["SUPER_ADMIN", "ADMIN", "EDITOR"])
   return prisma.fAQ.findMany({
     orderBy: [{ order: "asc" }, { createdAt: "desc" }],
   })

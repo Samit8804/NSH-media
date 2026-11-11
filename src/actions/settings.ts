@@ -5,6 +5,7 @@ import prisma from "@/lib/db"
 import { requireRole } from "./auth-actions"
 
 export async function getSettings() {
+  await requireRole(["SUPER_ADMIN", "ADMIN"])
   return prisma.siteSettings.findFirst()
 }
 

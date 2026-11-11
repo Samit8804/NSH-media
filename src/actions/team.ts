@@ -5,6 +5,7 @@ import prisma from "@/lib/db"
 import { requireRole } from "./auth-actions"
 
 export async function getTeamMembers() {
+  await requireRole(["SUPER_ADMIN", "ADMIN", "EDITOR"])
   return prisma.teamMember.findMany({
     orderBy: { createdAt: "desc" },
   })

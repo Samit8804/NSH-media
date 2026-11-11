@@ -25,6 +25,7 @@ export async function getFeaturedPosts() {
 }
 
 export async function getAllPosts() {
+  await requireRole(["SUPER_ADMIN", "ADMIN", "EDITOR"])
   return prisma.blogPost.findMany({
     orderBy: { createdAt: "desc" },
   })

@@ -12,6 +12,7 @@ export async function getPricingPlans() {
 }
 
 export async function getAllPricingPlans() {
+  await requireRole(["SUPER_ADMIN", "ADMIN", "EDITOR"])
   return prisma.pricing.findMany({
     orderBy: { createdAt: "desc" },
   })

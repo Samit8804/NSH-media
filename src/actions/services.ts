@@ -12,6 +12,7 @@ export async function getServices() {
 }
 
 export async function getAllServices() {
+  await requireRole(["SUPER_ADMIN", "ADMIN", "EDITOR"])
   return prisma.service.findMany({
     orderBy: { createdAt: "desc" },
   })

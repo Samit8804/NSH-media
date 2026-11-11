@@ -12,6 +12,7 @@ export async function getTestimonials() {
 }
 
 export async function getAllTestimonials() {
+  await requireRole(["SUPER_ADMIN", "ADMIN", "EDITOR"])
   return prisma.testimonial.findMany({
     orderBy: { createdAt: "desc" },
   })
