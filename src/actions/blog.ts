@@ -12,14 +12,14 @@ export async function getPosts() {
 }
 
 export async function getPostBySlug(slug: string) {
-  return prisma.blogPost.findUnique({
-    where: { slug },
+  return prisma.blogPost.findFirst({
+    where: { slug, published: true },
   })
 }
 
 export async function getFeaturedPosts() {
   return prisma.blogPost.findMany({
-    where: { featured: true },
+    where: { featured: true, published: true },
     orderBy: { createdAt: "desc" },
   })
 }

@@ -48,14 +48,14 @@ export async function getAllProjects() {
 }
 
 export async function getProjectBySlug(slug: string) {
-  return prisma.project.findUnique({
-    where: { slug },
+  return prisma.project.findFirst({
+    where: { slug, published: true },
   })
 }
 
 export async function getFeaturedProjects() {
   return prisma.project.findMany({
-    where: { featured: true },
+    where: { featured: true, published: true },
     orderBy: { displayOrder: "asc" },
   })
 }
