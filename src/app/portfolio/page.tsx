@@ -2,32 +2,27 @@ import type { Metadata } from "next"
 import { getProjects } from "@/actions/portfolio"
 import PortfolioPage from "./PageClient"
 import type { ProjectData } from "@/data/portfolio"
+import JsonLdScript from "@/components/seo/JsonLdScript"
+import {
+  breadcrumbSchema,
+  collectionPageSchema,
+  webPageSchema,
+} from "@/lib/seo"
+import { pageMetadata } from "@/lib/metadata"
 
 export const dynamic = "force-dynamic"
 
-export const metadata: Metadata = {
-  title: "Portfolio",
-  description: "Browse our portfolio of successful web development, design, and branding projects. See how we've helped businesses achieve their digital goals.",
-  openGraph: {
-    title: "Portfolio | NSH Media",
-    description: "Browse our portfolio of successful web development, design, and branding projects. See how we've helped businesses achieve their digital goals.",
-    url: "https://nshmedia.com/portfolio",
-    images: [{ url: "/og-default.svg", width: 1200, height: 630 }],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Portfolio | NSH Media",
-    description: "Browse our portfolio of successful web development, design, and branding projects. See how we've helped businesses achieve their digital goals.",
-    images: ["/og-default.svg"],
-  },
-  alternates: {
-    canonical: "https://nshmedia.com/portfolio",
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-}
+export const metadata: Metadata = pageMetadata({
+  title: "Web Design & Development Portfolio",
+  description:
+    "The NSH Media Services portfolio of website design, web development, and e-commerce projects. Published project work appears here as it becomes available.",
+  path: "/portfolio",
+  keywords: [
+    "web design portfolio",
+    "web development portfolio",
+    "e-commerce website examples",
+  ],
+})
 
 export default async function Page() {
   const projects = await getProjects()
@@ -47,5 +42,34 @@ export default async function Page() {
     liveUrl: p.liveUrl,
   })) as unknown as ProjectData[]
 
-  return <PortfolioPage projects={jsonProjects} />
+  const description =
+    "Website design, web development, and e-commerce projects by NSH Media Services."
+  const structuredData = [
+    webPageSchema({
+      title: "Web Design & Development Portfolio",
+      description,
+      path: "/portfolio",
+      type: "WebPage",
+    }),
+    collectionPageSchema({
+      name: "NSH Media Services portfolio",
+      description,
+      path: "/portfolio",
+      items: jsonProjects.map((project) => ({
+        name: project.title,
+        url: `/portfolio/${project.slug}`,
+      })),
+    }),
+    breadcrumbSchema([
+      { name: "Home", url: "/" },
+      { name: "Portfolio", url: "/portfolio" },
+    ]),
+  ]
+
+  return (
+    <>
+      <JsonLdScript schema={structuredData} />
+      <PortfolioPage projects={jsonProjects} />
+    </>
+  )
 }

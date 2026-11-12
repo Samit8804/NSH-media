@@ -97,7 +97,10 @@ export default function ContactPage() {
             <CheckCircle className="h-12 w-12 text-success" />
           </motion.div>
           <h1 className="text-section mb-4">Message Sent!</h1>
-          <p className="mb-8 text-lg leading-relaxed text-silver">Thank you for reaching out. We will get back to you within 24 hours.</p>
+          <p className="mb-8 text-lg leading-relaxed text-silver">
+            Thank you for reaching out. We will review your message and reply by
+            email as soon as possible.
+          </p>
           <Link href="/"><Button variant="outline" className="gap-2 border-white/20 text-white hover:bg-white/10"><ArrowRight className="h-4 w-4" /> Back to Home</Button></Link>
         </div>
       </div>
@@ -113,7 +116,14 @@ export default function ContactPage() {
             Get in{" "}<span className="text-gradient">Touch</span>
           </motion.h1>
           <motion.p initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.1 }} className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-silver">
-            Have a project in mind? We would love to hear from you. Fill out the form and we will get back to you within 24 hours.
+            Have a website, web development, or e-commerce project in mind?
+            Send us the details and we will reply by email. You can also email
+            us directly at{" "}
+            <ObfuscatedEmail
+              email={contactEmail}
+              className="font-medium text-primary"
+            />
+            .
           </motion.p>
         </div>
       </section>
@@ -151,10 +161,8 @@ export default function ContactPage() {
                       <SelectContent className="bg-dark-bg border-white/10">
                         <SelectItem value="web-design">Web Design</SelectItem>
                         <SelectItem value="web-development">Web Development</SelectItem>
-                        <SelectItem value="seo">SEO</SelectItem>
-                        <SelectItem value="ai-automation">AI Automation</SelectItem>
-                        <SelectItem value="branding">Branding</SelectItem>
                         <SelectItem value="ecommerce">E-Commerce</SelectItem>
+                        <SelectItem value="not-sure">Not sure yet</SelectItem>
                       </SelectContent>
                     </Select>
                     {errors.service && <p className="mt-1 text-xs text-destructive">{errors.service.message}</p>}
@@ -217,12 +225,22 @@ export default function ContactPage() {
               )}
 
               <div>
-                <p className="mb-3 font-semibold">Our Location</p>
-                <div className="glass-card aspect-[16/9] flex items-center justify-center">
-                  <div className="text-center">
-                    <MapPin className="mx-auto mb-2 h-8 w-8 text-primary/50" />
-                    <span className="text-sm text-silver/60">Interactive Map</span>
-                  </div>
+                <p className="mb-3 font-semibold">What happens next?</p>
+                <div className="glass-card p-6">
+                  <ol className="space-y-3 text-sm leading-relaxed text-silver">
+                    <li className="flex gap-3">
+                      <span className="font-semibold text-primary">1.</span>
+                      We review your goals, scope, and timeline.
+                    </li>
+                    <li className="flex gap-3">
+                      <span className="font-semibold text-primary">2.</span>
+                      We reply by email with clarifying questions or next steps.
+                    </li>
+                    <li className="flex gap-3">
+                      <span className="font-semibold text-primary">3.</span>
+                      If it is a good fit, we agree on scope and a project plan.
+                    </li>
+                  </ol>
                 </div>
               </div>
             </motion.div>

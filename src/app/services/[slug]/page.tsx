@@ -1,59 +1,89 @@
-import { notFound } from 'next/navigation'
-import type { Metadata } from 'next'
-import { getServiceBySlug } from '@/actions/services'
-import ServiceDetailClient from './ServiceDetailClient'
+import { notFound } from "next/navigation"
+import type { Metadata } from "next"
+import { getServiceBySlug, getServices } from "@/actions/services"
+import ServiceDetailClient from "./ServiceDetailClient"
+import JsonLdScript from "@/components/seo/JsonLdScript"
+import {
+  breadcrumbSchema,
+  faqPageSchema,
+  serviceSchema,
+  webPageSchema,
+} from "@/lib/seo"
+import { ogImage, pageMetadata } from "@/lib/metadata"
+import { SITE_NAME } from "@/lib/site"
 
-const SERVICE_IMAGES: Record<string, string> = {
-  'web-design': '/images/services/web-design.jpg',
-  'web-development': '/images/services/web-development.jpg',
-  'ecommerce': '/images/services/ecommerce.jpg',
-  'seo': '/images/services/seo.jpg',
-  'branding': '/images/services/branding.jpg',
-  'ai-automation': '/images/services/ai-automation.jpg',
-}
-
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}): Promise<Metadata> {
   try {
     const { slug } = await params
     const service = await getServiceBySlug(slug)
     if (!service) return {}
-    const image = SERVICE_IMAGES[service.slug]
-    return {
-      title: service.seoTitle || service.title,
+
+    const title = service.seoTitle || `${service.title} Services`
+    return pageMetadata({
+      title,
       description: service.seoDescription || service.description,
-      openGraph: {
-        title: service.seoTitle || service.title,
-        description: service.seoDescription || service.description,
-        url: `/services/${slug}`,
-        ...(image && { images: [{ url: image, width: 1200, height: 630 }] }),
-      },
-      twitter: {
-        card: 'summary_large_image',
-        title: service.seoTitle || service.title,
-        description: service.seoDescription || service.description,
-        ...(image && { images: [image] }),
-      },
-      alternates: { canonical: `/services/${slug}` },
-    }
+      path: `/services/${service.slug}`,
+      keywords: service.seoKeywords
+        ? service.seoKeywords.split(",").map((keyword) => keyword.trim())
+        : [
+            `${service.title.toLowerCase()} services`,
+            `custom ${service.title.toLowerCase()}`,
+            `${service.title.toLowerCase()} for business`,
+          ],
+      image: ogImage(`${service.title} Services`, SITE_NAME),
+    })
   } catch {
     return {}
   }
 }
 
-export default async function ServiceDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function ServiceDetailPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}) {
   const { slug } = await params
   const service = await getServiceBySlug(slug)
 
-  if (!service) notFound()
+  if (!service || !service.published) notFound()
 
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Service',
-    name: service.title,
-    description: service.description,
-    provider: { '@type': 'Organization', name: 'NSH Media' },
-    url: `/services/${slug}`,
-  }
+  const faqs = (service.faqs ?? []) as Array<{
+    question: string
+    answer: string
+  }>
+
+  const allServices = await getServices()
+  const relatedServices = (allServices || [])
+    .filter((item) => item.slug !== service.slug)
+    .map((item) => ({
+      title: item.title,
+      slug: item.slug,
+      description: item.description,
+    }))
+
+  const structuredData = [
+    webPageSchema({
+      title: `${service.title} Services`,
+      description: service.seoDescription || service.description,
+      path: `/services/${service.slug}`,
+      type: "ItemPage",
+    }),
+    serviceSchema({
+      title: service.title,
+      slug: service.slug,
+      description: service.description,
+    }),
+    ...(faqs.length ? [faqPageSchema(faqs)] : []),
+    breadcrumbSchema([
+      { name: "Home", url: "/" },
+      { name: "Services", url: "/services" },
+      { name: service.title, url: `/services/${service.slug}` },
+    ]),
+  ]
 
   const plainService = {
     id: service.id,
@@ -63,14 +93,20 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
     icon: service.icon,
     benefits: (service.benefits ?? []) as string[],
     features: (service.features ?? []) as string[],
-    process: (service.process ?? []) as Array<{ title: string; description: string }>,
-    faqs: (service.faqs ?? []) as Array<{ question: string; answer: string }>,
+    process: (service.process ?? []) as Array<{
+      title: string
+      description: string
+    }>,
+    faqs,
   }
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <ServiceDetailClient service={plainService} />
+      <JsonLdScript schema={structuredData} />
+      <ServiceDetailClient
+        service={plainService}
+        relatedServices={relatedServices}
+      />
     </>
   )
 }

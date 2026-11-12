@@ -4,8 +4,8 @@ import { motion } from "framer-motion"
 
 const technologies = [
   "Next.js", "React", "TypeScript", "Node.js",
-  "MongoDB", "AWS", "Vercel", "Tailwind CSS",
-  "Framer Motion", "GraphQL", "Docker", "Figma",
+  "PostgreSQL", "Prisma", "Vercel", "Tailwind CSS",
+  "Framer Motion",
 ]
 
 const containerVariants = {

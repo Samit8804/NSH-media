@@ -17,22 +17,11 @@ async function main() {
     },
   })
 
-  const editor = await prisma.user.upsert({
-    where: { email: "editor@nshmedia.com" },
-    update: {},
-    create: {
-      name: "Editor",
-      email: "editor@nshmedia.com",
-      password: adminPassword,
-      role: "EDITOR",
-    },
-  })
-
   const services = [
     {
       title: "Web Design",
       slug: "web-design",
-      description: "Beautiful, user-centric designs that captivate your audience and drive engagement.",
+      description: "Responsive website design for businesses: discovery, wireframes, page design, and a reusable design system that developers can build from.",
       icon: "Palette",
       benefits: ["Modern UI/UX", "Mobile-first design", "Conversion optimized", "Brand aligned"],
       features: ["Custom UI/UX Design", "Wireframing & Prototyping", "Responsive Design", "Design Systems", "User Research", "A/B Testing"],
@@ -43,18 +32,18 @@ async function main() {
     {
       title: "Web Development",
       slug: "web-development",
-      description: "High-performance web applications built with cutting-edge technology.",
+      description: "Custom website and web application development with modern frameworks, clean code, and attention to performance, accessibility, and technical SEO.",
       icon: "Code",
       benefits: ["Fast performance", "Scalable architecture", "SEO optimized", "Secure by default"],
       features: ["Next.js Development", "React Applications", "API Development", "Database Design", "Cloud Deployment", "Performance Optimization"],
       process: [{ title: "Planning", description: "Architecture and technology decisions" }, { title: "Setup", description: "Project scaffolding and configuration" }, { title: "Development", description: "Building features iteratively" }, { title: "Testing", description: "Comprehensive quality assurance" }, { title: "Deploy", description: "Production deployment and monitoring" }],
-      faqs: [{ question: "What technologies do you use?", answer: "We specialize in Next.js, React, TypeScript, Node.js, and PostgreSQL." }, { question: "Do you provide post-launch support?", answer: "Yes, we offer maintenance packages for ongoing support." }],
+      faqs: [{ question: "What technologies do you use?", answer: "We specialize in Next.js, React, TypeScript, Node.js, and PostgreSQL." }, { question: "Do you provide post-launch support?", answer: "Post-launch support is agreed as part of each project. NSH Media Services does not sell a separate monthly maintenance plan." }],
       published: true,
     },
     {
       title: "E-Commerce",
       slug: "ecommerce",
-      description: "Revenue-driven online stores with seamless shopping experiences.",
+      description: "Online store design and development with clear product journeys, secure checkout, payment integration, and pre-launch testing.",
       icon: "ShoppingCart",
       benefits: ["Increased sales", "Better conversion", "Mobile optimized", "Secure checkout"],
       features: ["Custom Storefront", "Payment Integration", "Inventory Management", "Order Processing", "Shopping Cart", "Analytics Dashboard"],
@@ -73,10 +62,10 @@ async function main() {
   }
 
   const pricingPlans = [
-    { name: "Starter", slug: "starter", price: 499, description: "Perfect for small businesses getting started online", features: ["5 Pages Website", "Responsive Design", "Basic SEO Setup", "Contact Form", "Social Media Integration", "1 Month Support"], popular: false, published: true },
-    { name: "Business", slug: "business", price: 1499, description: "Ideal for growing businesses needing a stronger presence", features: ["10 Pages Website", "Custom Design", "Advanced SEO", "CMS Integration", "Blog Setup", "Analytics Setup", "3 Months Support"], popular: true, published: true },
-    { name: "Premium", slug: "premium", price: 3999, description: "For businesses demanding enterprise-grade solutions", features: ["Unlimited Pages", "Custom Web Application", "E-Commerce Ready", "Premium SEO Package", "API Integrations", "Priority Support", "6 Months Support"], popular: false, published: true },
-    { name: "Enterprise", slug: "enterprise", price: 0, description: "Tailored solutions for large organizations", features: ["Custom Scope", "Dedicated Team", "Full Stack Development", "DevOps & Infrastructure", "24/7 Support", "SLA Guaranteed", "Custom Integrations"], highlighted: true, popular: false, published: true },
+    { name: "Starter", slug: "starter", price: 499, description: "For small businesses getting started online", features: ["5 Pages Website", "Responsive Design", "Technical SEO Foundations", "Contact Form", "Social Profile Links", "1 Month Support"], popular: false, published: true },
+    { name: "Business", slug: "business", price: 1499, description: "For growing businesses that need a stronger presence", features: ["10 Pages Website", "Custom Design", "On-Page SEO Setup", "CMS Integration", "Blog Setup", "Analytics Setup", "3 Months Support"], popular: true, published: true },
+    { name: "Premium", slug: "premium", price: 3999, description: "For larger or more complex website projects", features: ["Custom Page Count", "Custom Web Application", "E-Commerce Ready", "Technical SEO & Performance", "API Integrations", "Priority Support", "6 Months Support"], popular: false, published: true },
+    { name: "Enterprise", slug: "enterprise", price: 0, description: "Tailored scope for larger organizations", features: ["Custom Scope", "Full Stack Development", "E-Commerce Integration", "Analytics & Reporting", "Custom Integrations", "Post-Launch Support as Agreed"], highlighted: true, popular: false, published: true },
   ]
 
   for (const plan of pricingPlans) {
@@ -89,10 +78,10 @@ async function main() {
 
   const faqs = [
     { question: "What is the typical timeline for a website project?", answer: "Most projects take 4-8 weeks from kickoff to launch, depending on complexity and scope.", category: "General", order: 1, published: true },
-    { question: "Do you offer ongoing maintenance?", answer: "Yes, we offer monthly maintenance packages that include updates, backups, security patches, and content changes.", category: "Services", order: 2, published: true },
-    { question: "What technologies do you specialize in?", answer: "We specialize in Next.js, React, TypeScript, Node.js, PostgreSQL, and cloud platforms like AWS and Vercel.", category: "General", order: 3, published: true },
-    { question: "How much does a website cost?", answer: "Our projects start at $499 for simple sites and go up to $10,000+ for complex web applications.", category: "Pricing", order: 4, published: true },
-    { question: "Do you provide SEO services?", answer: "Yes, we offer comprehensive SEO packages including technical SEO, on-page optimization, and content strategy.", category: "Services", order: 5, published: true },
+    { question: "Do you offer ongoing maintenance?", answer: "Post-launch support is scoped in each project agreement. We do not currently offer a separate monthly maintenance plan.", category: "Services", order: 2, published: true },
+    { question: "What technologies do you specialize in?", answer: "We work primarily with Next.js, React, TypeScript, Node.js, PostgreSQL, and Vercel.", category: "General", order: 3, published: true },
+    { question: "How much does a website cost?", answer: "Published website packages start at $499. Final cost depends on scope, features, and content; see the pricing page for current starting prices.", category: "Pricing", order: 4, published: true },
+    { question: "Do you provide SEO services?", answer: "We do not offer SEO as a standalone service. Every website we design and build includes technical SEO foundations such as clean structure, metadata, and fast, crawlable pages.", category: "Services", order: 5, published: true },
     { question: "Can you redesign my existing website?", answer: "Absolutely! We can audit your current site and create a modern redesign that improves performance and user experience.", category: "Services", order: 6, published: true },
   ]
 

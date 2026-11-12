@@ -1,49 +1,66 @@
-import { notFound } from 'next/navigation'
-import type { Metadata } from 'next'
-import { getProjectBySlug, getProjects } from '@/actions/portfolio'
-import PortfolioDetailClient from './PortfolioDetailClient'
-import type { ProjectData } from '@/data/portfolio'
+import { notFound } from "next/navigation"
+import type { Metadata } from "next"
+import { getProjectBySlug, getProjects } from "@/actions/portfolio"
+import PortfolioDetailClient from "./PortfolioDetailClient"
+import type { ProjectData } from "@/data/portfolio"
+import JsonLdScript from "@/components/seo/JsonLdScript"
+import { breadcrumbSchema, projectSchema } from "@/lib/seo"
+import { ogImage, pageMetadata } from "@/lib/metadata"
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}): Promise<Metadata> {
   try {
     const { slug } = await params
     const project = await getProjectBySlug(slug)
     if (!project) return {}
-    return {
+
+    return pageMetadata({
       title: project.title,
       description: project.description,
-      openGraph: {
-        title: project.title,
-        description: project.description,
-        url: `/portfolio/${slug}`,
-      },
-      twitter: {
-        card: 'summary_large_image',
-        title: project.title,
-        description: project.description,
-      },
-      alternates: { canonical: `/portfolio/${slug}` },
-    }
+      path: `/portfolio/${project.slug}`,
+      type: "article",
+      keywords: [
+        project.category,
+        ...((project.technologies as string[] | null) ?? []),
+      ].filter(Boolean),
+      image: ogImage(project.title, project.category),
+      imageAlt: `${project.title} — ${project.category}`,
+    })
   } catch {
     return {}
   }
 }
 
-export default async function PortfolioDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function PortfolioDetailPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}) {
   const { slug } = await params
   const project = await getProjectBySlug(slug)
 
   if (!project) notFound()
 
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'CreativeWork',
-    name: project.title,
-    description: project.description,
-    author: { '@type': 'Organization', name: 'NSH Media' },
-    about: project.industry,
-    url: `/portfolio/${slug}`,
-  }
+  const structuredData = [
+    projectSchema({
+      title: project.title,
+      slug: project.slug,
+      description: project.description,
+      client: project.client,
+      category: project.category,
+      technologies: (project.technologies as string[] | null) ?? [],
+      liveUrl: project.liveUrl,
+      publishedAt: project.createdAt,
+    }),
+    breadcrumbSchema([
+      { name: "Home", url: "/" },
+      { name: "Portfolio", url: "/portfolio" },
+      { name: project.title, url: `/portfolio/${project.slug}` },
+    ]),
+  ]
 
   const allProjects = await getProjects()
   const relatedProjects = ((allProjects || []) as unknown as Array<Record<string, unknown>>)
@@ -68,14 +85,14 @@ export default async function PortfolioDetailPage({ params }: { params: Promise<
     solution: project.solution,
     technologies: (project.technologies as string[]) ?? [],
     results: (project.results as string[]) ?? [],
-    testimonial: (project.testimonial ?? null) as ProjectData['testimonial'],
+    testimonial: (project.testimonial ?? null) as ProjectData["testimonial"],
     category: project.category,
-    liveUrl: (project.liveUrl ?? null) as ProjectData['liveUrl'],
+    liveUrl: (project.liveUrl ?? null) as ProjectData["liveUrl"],
   } as unknown as ProjectData
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <JsonLdScript schema={structuredData} />
       <PortfolioDetailClient
         slug={slug}
         project={plainProject}

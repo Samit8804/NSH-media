@@ -16,7 +16,7 @@ export default function ThankYouPage() {
           Thank You!
         </motion.h1>
         <motion.p className="mb-8 text-lg leading-relaxed text-silver" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, duration: 0.5 }}>
-          We have received your message and will get back to you within 24 hours.
+          We have received your message and will reply as soon as possible.
         </motion.p>
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.5 }}>
           <Link href="/">

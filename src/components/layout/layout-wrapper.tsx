@@ -6,7 +6,10 @@ import Footer from "./footer"
 
 export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  const hideUI = pathname.startsWith("/admin") || pathname.startsWith("/auth")
+  const hideUI =
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/client") ||
+    pathname.startsWith("/auth")
 
   return (
     <div className="flex min-h-screen flex-col">

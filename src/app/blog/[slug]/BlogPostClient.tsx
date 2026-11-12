@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Calendar, User, Tag, ArrowLeft } from "lucide-react"
+import { Calendar, User, Tag, ArrowLeft, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { formatDate } from "@/lib/utils"
@@ -89,6 +89,30 @@ export default function BlogPostClient({ post, relatedPosts = [] }: BlogPostClie
 
       <section className="px-6 py-16">
         <div className="mx-auto max-w-3xl">
+          <nav aria-label="Breadcrumb" className="mb-8">
+            <ol className="flex flex-wrap items-center gap-2 text-xs text-silver/70">
+              <li>
+                <Link href="/" className="transition-colors hover:text-white">
+                  Home
+                </Link>
+              </li>
+              <li aria-hidden="true" className="text-silver/30">
+                /
+              </li>
+              <li>
+                <Link href="/blog" className="transition-colors hover:text-white">
+                  Blog
+                </Link>
+              </li>
+              <li aria-hidden="true" className="text-silver/30">
+                /
+              </li>
+              <li aria-current="page" className="line-clamp-1 text-silver">
+                {post.title}
+              </li>
+            </ol>
+          </nav>
+
           <motion.div className="mb-12 flex items-center gap-4" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
             <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-[#7C3AED]/20 text-lg font-bold text-primary">
               {post.author.split(" ").map((n) => n[0]).join("").slice(0, 2)}
@@ -156,6 +180,31 @@ export default function BlogPostClient({ post, relatedPosts = [] }: BlogPostClie
           </div>
         </section>
       )}
+
+      <section className="border-t border-white/10 px-6 py-16">
+        <div className="container-site">
+          <motion.div {...fadeInUp} className="text-center">
+            <h2 className="text-subsection">Need help with a project?</h2>
+            <p className="mx-auto mt-3 max-w-2xl text-silver">
+              NSH Media Services provides web design, web development, and
+              e-commerce. Explore the services or start a conversation about
+              your goals.
+            </p>
+            <div className="mt-8 flex flex-wrap justify-center gap-4">
+              <Link href="/services">
+                <Button variant="outline" className="gap-2 border-white/10 text-white hover:bg-white/10">
+                  Explore Services <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+              <Link href="/contact">
+                <Button className="gap-2 bg-primary text-white hover:bg-primary-hover">
+                  Contact Us <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
+          </motion.div>
+        </div>
+      </section>
 
       <section className="border-t border-white/10 px-6 py-12">
         <div className="container-site text-center">

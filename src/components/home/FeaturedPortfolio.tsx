@@ -48,7 +48,7 @@ export default function FeaturedPortfolio({ projects }: FeaturedPortfolioProps) 
           <div>
             <h2 className="text-section text-gradient font-heading">Featured Work</h2>
             <p className="mt-4 text-lg text-silver max-w-xl">
-              A selection of our recent projects that showcase our expertise.
+              A selection of recent projects.
             </p>
           </div>
           <Link href="/portfolio" className="hidden sm:block">

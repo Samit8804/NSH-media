@@ -1,310 +1,328 @@
-import type { BlogPost, Project, Service, TeamMember, Testimonial, FAQ, Pricing } from '@prisma/client';
+import {
+  absoluteUrl,
+  CONTACT_EMAIL,
+  DEFAULT_OG_IMAGE,
+  SITE_BRAND,
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_TAGLINE,
+  SITE_URL,
+} from "./site"
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://nshmedia.com';
+/**
+ * JSON-LD builders.
+ *
+ * Rules:
+ * - Only verified business information is emitted.
+ * - Every URL is absolute and uses the canonical site origin.
+ * - No reviews, ratings, prices, addresses, or phone numbers are invented.
+ */
 
-interface SchemaOrg {
-  '@context': 'https://schema.org';
-  '@type': string;
-  [key: string]: unknown;
+export type JsonLd = Record<string, unknown>
+
+export const ORGANIZATION_ID = `${SITE_URL}/#organization`
+export const WEBSITE_ID = `${SITE_URL}/#website`
+
+const LOGO_URL = absoluteUrl("/icon-512.png")
+const OG_IMAGE_URL = absoluteUrl(DEFAULT_OG_IMAGE)
+
+function socialProfiles(): string[] {
+  return [
+    process.env.NEXT_PUBLIC_LINKEDIN_URL,
+    process.env.NEXT_PUBLIC_TWITTER_URL,
+    process.env.NEXT_PUBLIC_GITHUB_URL,
+    process.env.NEXT_PUBLIC_YOUTUBE_URL,
+  ].filter((url): url is string => Boolean(url && url.trim()))
 }
 
-export function organizationSchema(): SchemaOrg {
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'Organization',
-    name: 'NSH Media',
-    url: BASE_URL,
-    logo: `${BASE_URL}/favicon.svg`,
-    description: 'Building Digital Experiences That Drive Growth',
-    foundingDate: '2024',
-    contactPoint: {
-      '@type': 'ContactPoint',
-      telephone: process.env.NEXT_PUBLIC_CONTACT_PHONE || '+1-555-123-4567',
-      contactType: 'customer service',
-      email: process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'hello@nshmedia.com',
-      availableLanguage: ['English'],
-    },
-    sameAs: [
-      process.env.NEXT_PUBLIC_LINKEDIN_URL || 'https://linkedin.com/company/nshmedia',
-      process.env.NEXT_PUBLIC_TWITTER_URL || 'https://twitter.com/nshmedia',
-      process.env.NEXT_PUBLIC_GITHUB_URL || 'https://github.com/nshmedia',
-    ],
-    address: {
-      '@type': 'PostalAddress',
-      addressCountry: 'US',
-    },
-  };
-}
+export function organizationSchema(): JsonLd {
+  const sameAs = socialProfiles()
 
-export function websiteSchema(): SchemaOrg {
   return {
-    '@context': 'https://schema.org',
-    '@type': 'WebSite',
-    name: 'NSH Media',
-    url: BASE_URL,
-    potentialAction: {
-      '@type': 'SearchAction',
-      target: {
-        '@type': 'EntryPoint',
-        urlTemplate: `${BASE_URL}/search?q={search_term_string}`,
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": ORGANIZATION_ID,
+    name: SITE_NAME,
+    alternateName: SITE_BRAND,
+    slogan: SITE_TAGLINE,
+    url: SITE_URL,
+    description: SITE_DESCRIPTION,
+    logo: {
+      "@type": "ImageObject",
+      url: LOGO_URL,
+      width: 512,
+      height: 512,
+    },
+    image: OG_IMAGE_URL,
+    email: CONTACT_EMAIL,
+    contactPoint: [
+      {
+        "@type": "ContactPoint",
+        contactType: "sales",
+        email: CONTACT_EMAIL,
+        availableLanguage: ["English"],
+        url: absoluteUrl("/contact"),
       },
-      'query-input': 'required name=search_term_string',
-    },
-  };
+    ],
+    knowsAbout: [
+      "Web design",
+      "Website design",
+      "Web development",
+      "Website development",
+      "E-commerce development",
+      "Online store design",
+      "Responsive web design",
+      "User experience design",
+    ],
+    ...(sameAs.length ? { sameAs } : {}),
+  }
 }
 
-export function webpageSchema(title: string, description: string, url: string, dateModified?: string): SchemaOrg {
-  const schema: SchemaOrg = {
-    '@context': 'https://schema.org',
-    '@type': 'WebPage',
+export function websiteSchema(): JsonLd {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": WEBSITE_ID,
+    name: SITE_NAME,
+    alternateName: SITE_BRAND,
+    url: SITE_URL,
+    description: SITE_DESCRIPTION,
+    inLanguage: "en",
+    publisher: { "@id": ORGANIZATION_ID },
+  }
+}
+
+type WebPageType =
+  | "WebPage"
+  | "AboutPage"
+  | "ContactPage"
+  | "CollectionPage"
+  | "FAQPage"
+  | "ItemPage"
+
+export function webPageSchema({
+  title,
+  description,
+  path,
+  type = "WebPage",
+  dateModified,
+}: {
+  title: string
+  description: string
+  path: string
+  type?: WebPageType
+  dateModified?: string
+}): JsonLd {
+  return {
+    "@context": "https://schema.org",
+    "@type": type,
     name: title,
     description,
-    url: `${BASE_URL}${url}`,
-    publisher: {
-      '@type': 'Organization',
-      name: 'NSH Media',
-      logo: `${BASE_URL}/favicon.svg`,
-    },
-  };
-  if (dateModified) {
-    schema.dateModified = dateModified;
+    url: absoluteUrl(path),
+    isPartOf: { "@id": WEBSITE_ID },
+    about: { "@id": ORGANIZATION_ID },
+    inLanguage: "en",
+    ...(dateModified ? { dateModified } : {}),
   }
-  return schema;
 }
 
-export function breadcrumbSchema(items: { name: string; url: string }[]): SchemaOrg {
+export function breadcrumbSchema(
+  items: { name: string; url: string }[],
+): JsonLd {
   return {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
     itemListElement: items.map((item, index) => ({
-      '@type': 'ListItem',
+      "@type": "ListItem",
       position: index + 1,
       name: item.name,
-      item: `${BASE_URL}${item.url}`,
+      item: absoluteUrl(item.url),
     })),
-  };
-}
-
-export function articleSchema(post: {
-  title: string;
-  slug: string;
-  excerpt: string;
-  author: string;
-  featuredImage?: string | null;
-  publishedAt: Date | string;
-  updatedAt: Date | string;
-  tags?: string[];
-  categories?: string[];
-}): SchemaOrg {
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'Article',
-    headline: post.title,
-    description: post.excerpt,
-    url: `${BASE_URL}/blog/${post.slug}`,
-    image: post.featuredImage || `${BASE_URL}/og-default.svg`,
-    datePublished: post.publishedAt instanceof Date ? post.publishedAt.toISOString() : post.publishedAt,
-    dateModified: post.updatedAt instanceof Date ? post.updatedAt.toISOString() : post.updatedAt,
-    author: {
-      '@type': 'Person',
-      name: post.author,
-    },
-    publisher: {
-      '@type': 'Organization',
-      name: 'NSH Media',
-      logo: `${BASE_URL}/favicon.svg`,
-    },
-    ...(post.tags?.length ? { keywords: post.tags.join(', ') } : {}),
-  };
-}
-
-export function blogPostingSchema(post: {
-  title: string;
-  slug: string;
-  excerpt: string;
-  author: string;
-  featuredImage?: string | null;
-  publishedAt: Date | string;
-  updatedAt: Date | string;
-  tags?: string[];
-  categories?: string[];
-}): SchemaOrg {
-  const schema = articleSchema(post);
-  schema['@type'] = 'BlogPosting';
-  return schema;
+  }
 }
 
 export function serviceSchema(service: {
-  title: string;
-  slug: string;
-  description: string;
-  image?: string | null;
-  price?: string | null;
-}): SchemaOrg {
-  const schema: SchemaOrg = {
-    '@context': 'https://schema.org',
-    '@type': 'Service',
-    name: service.title,
-    description: service.description,
-    url: `${BASE_URL}/services/${service.slug}`,
-    provider: {
-      '@type': 'Organization',
-      name: 'NSH Media',
-    },
-    image: service.image || `${BASE_URL}/og-default.svg`,
-  };
-  if (service.price) {
-    schema.offers = {
-      '@type': 'Offer',
-      price: service.price,
-      priceCurrency: 'USD',
-    };
-  }
-  return schema;
-}
+  title: string
+  slug: string
+  description: string
+}): JsonLd {
+  const url = absoluteUrl(`/services/${service.slug}`)
 
-export function projectSchema(project: {
-  title: string;
-  slug: string;
-  description: string;
-  client?: string;
-  category?: string;
-  technologies?: string[];
-  thumbnail?: string | null;
-  url?: string | null;
-  publishedAt?: Date | string;
-}): SchemaOrg {
-  const schema: SchemaOrg = {
-    '@context': 'https://schema.org',
-    '@type': 'CreativeWork',
-    name: project.title,
-    description: project.description,
-    url: `${BASE_URL}/portfolio/${project.slug}`,
-    image: project.thumbnail || `${BASE_URL}/og-default.svg`,
-  };
-  if (project.client) {
-    schema.author = { '@type': 'Organization', name: project.client };
-  }
-  if (project.category) {
-    schema.genre = project.category;
-  }
-  if (project.technologies?.length) {
-    schema.keywords = project.technologies.join(', ');
-  }
-  if (project.url) {
-    schema.sameAs = project.url;
-  }
-  if (project.publishedAt) {
-    schema.datePublished = project.publishedAt instanceof Date ? project.publishedAt.toISOString() : project.publishedAt;
-  }
-  return schema;
-}
-
-export function faqPageSchema(faqs: { question: string; answer: string }[]): SchemaOrg {
   return {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "@id": `${url}#service`,
+    name: service.title,
+    serviceType: service.title,
+    description: service.description,
+    url,
+    provider: { "@id": ORGANIZATION_ID },
+    availableChannel: {
+      "@type": "ServiceChannel",
+      serviceUrl: url,
+    },
+  }
+}
+
+export function faqPageSchema(
+  faqs: { question: string; answer: string }[],
+): JsonLd {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
     mainEntity: faqs.map((faq) => ({
-      '@type': 'Question',
+      "@type": "Question",
       name: faq.question,
       acceptedAnswer: {
-        '@type': 'Answer',
+        "@type": "Answer",
         text: faq.answer,
       },
     })),
-  };
-}
-
-export function personSchema(member: {
-  name: string;
-  role: string;
-  bio?: string;
-  image?: string | null;
-}): SchemaOrg {
-  const schema: SchemaOrg = {
-    '@context': 'https://schema.org',
-    '@type': 'Person',
-    name: member.name,
-    jobTitle: member.role,
-    description: member.bio || '',
-    worksFor: {
-      '@type': 'Organization',
-      name: 'NSH Media',
-    },
-  };
-  if (member.image) {
-    schema.image = member.image;
   }
-  return schema;
 }
 
-export function localBusinessSchema(): SchemaOrg {
+export function blogPostingSchema(post: {
+  title: string
+  slug: string
+  excerpt: string
+  author: string
+  image?: string | null
+  publishedAt: Date | string
+  updatedAt: Date | string
+  tags?: string[]
+  categories?: string[]
+}): JsonLd {
+  const url = absoluteUrl(`/blog/${post.slug}`)
+
   return {
-    '@context': 'https://schema.org',
-    '@type': 'LocalBusiness',
-    name: 'NSH Media',
-    image: `${BASE_URL}/favicon.svg`,
-    url: BASE_URL,
-    telephone: process.env.NEXT_PUBLIC_CONTACT_PHONE || '+1-555-123-4567',
-    email: process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'hello@nshmedia.com',
-    address: {
-      '@type': 'PostalAddress',
-      addressLocality: process.env.NEXT_PUBLIC_CITY || 'San Francisco',
-      addressRegion: process.env.NEXT_PUBLIC_STATE || 'CA',
-      addressCountry: 'US',
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.title,
+    description: post.excerpt,
+    url,
+    mainEntityOfPage: url,
+    image: post.image ? absoluteUrl(post.image) : OG_IMAGE_URL,
+    datePublished:
+      post.publishedAt instanceof Date
+        ? post.publishedAt.toISOString()
+        : post.publishedAt,
+    dateModified:
+      post.updatedAt instanceof Date
+        ? post.updatedAt.toISOString()
+        : post.updatedAt,
+    author: {
+      "@type": "Person",
+      name: post.author,
     },
-    openingHoursSpecification: [
-      { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Monday', opens: '09:00', closes: '18:00' },
-      { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Tuesday', opens: '09:00', closes: '18:00' },
-      { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Wednesday', opens: '09:00', closes: '18:00' },
-      { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Thursday', opens: '09:00', closes: '18:00' },
-      { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Friday', opens: '09:00', closes: '18:00' },
-    ],
-  };
-}
-
-export function reviewSchema(review: {
-  author: string;
-  content: string;
-  rating?: number;
-}): SchemaOrg {
-  const schema: SchemaOrg = {
-    '@context': 'https://schema.org',
-    '@type': 'Review',
-    author: { '@type': 'Person', name: review.author },
-    reviewBody: review.content,
-  };
-  if (review.rating) {
-    schema.reviewRating = { '@type': 'Rating', ratingValue: review.rating, bestRating: 5 };
+    publisher: { "@id": ORGANIZATION_ID },
+    ...(post.tags?.length ? { keywords: post.tags.join(", ") } : {}),
+    ...(post.categories?.length ? { articleSection: post.categories[0] } : {}),
   }
-  return schema;
 }
 
-export function productPricingSchema(plan: {
-  name: string;
-  description: string;
-  price: number | string;
-  currency?: string;
-  features?: string[];
-}): SchemaOrg {
-  const schema: SchemaOrg = {
-    '@context': 'https://schema.org',
-    '@type': 'Product',
-    name: plan.name,
-    description: plan.description,
-    offers: {
-      '@type': 'Offer',
-      price: typeof plan.price === 'number' ? plan.price.toString() : plan.price,
-      priceCurrency: plan.currency || 'USD',
-      availability: 'https://schema.org/OnlineOnly',
+export function projectSchema(project: {
+  title: string
+  slug: string
+  description: string
+  client?: string
+  category?: string
+  technologies?: string[]
+  image?: string | null
+  liveUrl?: string | null
+  publishedAt?: Date | string
+}): JsonLd {
+  const url = absoluteUrl(`/portfolio/${project.slug}`)
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    name: project.title,
+    description: project.description,
+    url,
+    mainEntityOfPage: url,
+    image: project.image ? absoluteUrl(project.image) : OG_IMAGE_URL,
+    creator: { "@id": ORGANIZATION_ID },
+    ...(project.client ? { sponsor: { "@type": "Organization", name: project.client } } : {}),
+    ...(project.category ? { genre: project.category } : {}),
+    ...(project.technologies?.length
+      ? { keywords: project.technologies.join(", ") }
+      : {}),
+    ...(project.liveUrl ? { sameAs: project.liveUrl } : {}),
+    ...(project.publishedAt
+      ? {
+          datePublished:
+            project.publishedAt instanceof Date
+              ? project.publishedAt.toISOString()
+              : project.publishedAt,
+        }
+      : {}),
+  }
+}
+
+export function collectionPageSchema({
+  name,
+  description,
+  path,
+  items,
+}: {
+  name: string
+  description: string
+  path: string
+  items: { name: string; url: string }[]
+}): JsonLd {
+  return {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name,
+    description,
+    url: absoluteUrl(path),
+    isPartOf: { "@id": WEBSITE_ID },
+    mainEntity: {
+      "@type": "ItemList",
+      numberOfItems: items.length,
+      itemListElement: items.map((item, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        name: item.name,
+        url: absoluteUrl(item.url),
+      })),
     },
-  };
-  if (plan.features?.length) {
-    schema.keywords = plan.features.join(', ');
   }
-  return schema;
 }
 
-export function renderJsonLd(schema: SchemaOrg): string {
-  return JSON.stringify(schema);
+export function offerCatalogSchema(
+  plans: {
+    name: string
+    description: string
+    price: number
+    slug: string
+  }[],
+): JsonLd {
+  return {
+    "@context": "https://schema.org",
+    "@type": "OfferCatalog",
+    name: `${SITE_NAME} website packages`,
+    url: absoluteUrl("/pricing"),
+    itemListElement: plans.map((plan, index) => ({
+      "@type": "Offer",
+      position: index + 1,
+      name: plan.name,
+      description: plan.description,
+      url: absoluteUrl(`/pricing#${plan.slug}`),
+      ...(plan.price > 0
+        ? {
+            priceSpecification: {
+              "@type": "PriceSpecification",
+              priceCurrency: "USD",
+              minPrice: plan.price,
+            },
+          }
+        : {}),
+    })),
+  }
+}
+
+/** Serializes JSON-LD for safe inline embedding. */
+export function jsonLdString(schema: JsonLd): string {
+  return JSON.stringify(schema).replace(/</g, "\\u003c")
 }

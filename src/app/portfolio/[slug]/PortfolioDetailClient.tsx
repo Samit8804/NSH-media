@@ -51,11 +51,13 @@ export default function PortfolioDetailClient({ slug, project: projectProp, rela
       <section className="relative overflow-hidden px-6 py-32 bg-mesh">
         <div className="absolute inset-0 bg-grid-subtle" />
         <div className="relative mx-auto max-w-6xl">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8 flex items-center gap-2 text-sm text-silver/60">
+          <motion.nav aria-label="Breadcrumb" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8 flex flex-wrap items-center gap-2 text-sm text-silver/60">
+            <Link href="/" className="transition-colors hover:text-white">Home</Link>
+            <ChevronRight className="h-3 w-3" />
             <Link href="/portfolio" className="transition-colors hover:text-white">Portfolio</Link>
             <ChevronRight className="h-3 w-3" />
             <span className="text-white">{project.title}</span>
-          </motion.div>
+          </motion.nav>
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-4">
             <Badge className="bg-primary/20 text-primary-hover hover:bg-primary/30">{project.category}</Badge>
           </motion.div>
@@ -126,15 +128,6 @@ export default function PortfolioDetailClient({ slug, project: projectProp, rela
                   <div className="mt-4 flex flex-wrap gap-2">
                     {project.technologies.map((tech, index) => (
                       <span key={index} className="rounded-[10px] border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-silver/70">{tech}</span>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="glass-card p-6">
-                  <h3 className="text-sm font-semibold uppercase tracking-wider text-silver/60">Project Gallery</h3>
-                  <div className="mt-4 grid grid-cols-2 gap-3">
-                    {[1, 2, 3, 4].map((i) => (
-                      <div key={i} className="flex aspect-video items-center justify-center rounded-xl bg-gradient-to-br from-primary/10 to-[#7C3AED]/10 text-xs text-primary/50">Screenshot {i}</div>
                     ))}
                   </div>
                 </div>

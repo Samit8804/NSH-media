@@ -1,4 +1,4 @@
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { Inter, Space_Grotesk } from "next/font/google"
 import Script from "next/script"
 import "@/styles/globals.css"
@@ -7,8 +7,17 @@ import AuthProvider from "@/providers/session-provider"
 import { ToastProvider } from "@/providers/toast-provider"
 import LayoutWrapper from "@/components/layout/layout-wrapper"
 import CursorFollower from "@/components/effects/cursor-follower"
-import SchemaOrg from "@/components/seo/SchemaOrg"
+import JsonLdScript from "@/components/seo/JsonLdScript"
 import FacebookPixel from "@/components/seo/FacebookPixel"
+import { organizationSchema, websiteSchema } from "@/lib/seo"
+import {
+  DEFAULT_OG_ALT,
+  DEFAULT_OG_IMAGE,
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_URL,
+} from "@/lib/site"
+import { SITE_METADATA_BASE } from "@/lib/metadata"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -24,87 +33,137 @@ const spaceGrotesk = Space_Grotesk({
   weight: ["400", "500", "600", "700"],
 })
 
+const defaultTitle =
+  "NSH Media Services | Web Design, Web Development & E-Commerce"
+
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://nshmedia.com"),
+  metadataBase: SITE_METADATA_BASE,
   title: {
-    default: "NSH Media — Building Digital Experiences That Drive Growth",
-    template: "%s | NSH Media",
+    default: defaultTitle,
+    template: `%s | ${SITE_NAME}`,
   },
-  description:
-    "NSH Media is a premier digital agency for web design, web development, SEO, AI automation, and branding. We build custom solutions that grow your business.",
+  description: SITE_DESCRIPTION,
   keywords: [
-    "web design",
-    "web development",
-    "e-commerce",
-    "SEO",
-    "branding",
-    "AI automation",
-    "digital agency",
+    "web design services",
+    "web development services",
+    "e-commerce development",
+    "custom website design",
+    "business website development",
+    "responsive website design",
+    "online store development",
+    "NSH Media Services",
   ],
-  authors: [{ name: "NSH Media" }],
-  creator: "NSH Media",
+  authors: [{ name: SITE_NAME, url: SITE_URL }],
+  creator: SITE_NAME,
+  publisher: SITE_NAME,
+  applicationName: SITE_NAME,
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://nshmedia.com",
-    siteName: "NSH Media",
-    title: "NSH Media — Building Digital Experiences That Drive Growth",
-    description:
-      "NSH Media is a premier digital agency for web design, web development, SEO, AI automation, and branding. We build custom solutions that grow your business.",
-    images: [{ url: "/og-default.svg", width: 1200, height: 630 }],
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    title: defaultTitle,
+    description: SITE_DESCRIPTION,
+    images: [
+      {
+        url: DEFAULT_OG_IMAGE,
+        width: 1200,
+        height: 630,
+        alt: DEFAULT_OG_ALT,
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "NSH Media — Building Digital Experiences That Drive Growth",
-    description:
-      "NSH Media is a premier digital agency for web design, web development, SEO, AI automation, and branding. We build custom solutions that grow your business.",
-    images: ["/og-default.svg"],
+    title: defaultTitle,
+    description: SITE_DESCRIPTION,
+    images: [DEFAULT_OG_IMAGE],
   },
   icons: {
-    icon: "/images/logo.png",
-    shortcut: "/images/logo.png",
-    apple: "/images/logo.png",
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    shortcut: "/favicon.svg",
+    apple: "/apple-icon.png",
   },
-  manifest: "/manifest",
+  manifest: "/manifest.webmanifest",
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
   },
   verification: {
-    google: process.env.GOOGLE_SITE_VERIFICATION || "w0VGkMPKvQsFO_k3ULNFDJShxFck5CU5Cqz6ZTUzb58",
-    yandex: "",
-    yahoo: "",
+    google:
+      process.env.GOOGLE_SITE_VERIFICATION ||
+      "w0VGkMPKvQsFO_k3ULNFDJShxFck5CU5Cqz6ZTUzb58",
+  },
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
   },
   other: {
     "theme-color": "#020617",
   },
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export const viewport: Viewport = {
+  themeColor: "#020617",
+  colorScheme: "dark",
+  width: "device-width",
+  initialScale: 1,
+}
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   return (
-    <html lang="en" className={`dark ${inter.variable} ${spaceGrotesk.variable}`} suppressHydrationWarning>
+    <html
+      lang="en"
+      className={`dark ${inter.variable} ${spaceGrotesk.variable}`}
+      suppressHydrationWarning
+    >
       <body
         className="min-h-screen font-sans text-foreground antialiased"
         style={{
-          background: "linear-gradient(to bottom, rgba(2,6,23,0.55), rgba(2,6,23,0.7)), url(/images/bg-hero.png) center/cover fixed",
+          background:
+            "linear-gradient(to bottom, rgba(2,6,23,0.55), rgba(2,6,23,0.7)), url(/images/bg-hero.jpg) center/cover fixed",
         }}
       >
-        <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-lg">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-lg"
+        >
           Skip to main content
         </a>
-        <SchemaOrg />
+        <JsonLdScript schema={[organizationSchema(), websiteSchema()]} />
         <CursorFollower />
         <ThemeProvider>
           <AuthProvider>
             <ToastProvider>
-              <LayoutWrapper><main id="main-content">{children}</main></LayoutWrapper>
+              <LayoutWrapper>
+                <main id="main-content">{children}</main>
+              </LayoutWrapper>
             </ToastProvider>
           </AuthProvider>
         </ThemeProvider>
 
         {process.env.NEXT_PUBLIC_GA_ID && (
           <>
-            <Script src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`} strategy="afterInteractive" />
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
+              strategy="afterInteractive"
+            />
             <Script id="google-analytics" strategy="afterInteractive">
               {`window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}');`}
             </Script>

@@ -1,7 +1,10 @@
-import { getPostBySlug, getPosts } from '@/actions/blog'
-import { notFound } from 'next/navigation'
-import type { Metadata } from 'next'
-import BlogPostClient from './BlogPostClient'
+import { getPostBySlug, getPosts } from "@/actions/blog"
+import { notFound } from "next/navigation"
+import type { Metadata } from "next"
+import BlogPostClient from "./BlogPostClient"
+import JsonLdScript from "@/components/seo/JsonLdScript"
+import { blogPostingSchema, breadcrumbSchema } from "@/lib/seo"
+import { ogImage, pageMetadata } from "@/lib/metadata"
 
 interface RelatedPost {
   title: string
@@ -27,34 +30,36 @@ interface BlogPost {
   authorImage?: string | null
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}): Promise<Metadata> {
   try {
     const { slug } = await params
     const post = await getPostBySlug(slug)
     if (!post) return {}
-    return {
-      title: post.seoTitle || post.title,
+
+    const title = post.seoTitle || post.title
+    return pageMetadata({
+      title,
       description: post.seoDescription || post.excerpt,
-      openGraph: {
-        title: post.seoTitle || post.title,
-        description: post.seoDescription || post.excerpt,
-        url: `/blog/${post.slug}`,
-        images: post.featuredImage ? [{ url: post.featuredImage, width: 1200, height: 630 }] : [],
-      },
-      twitter: {
-        card: 'summary_large_image',
-        title: post.seoTitle || post.title,
-        description: post.seoDescription || post.excerpt,
-        images: post.featuredImage ? [post.featuredImage] : [],
-      },
-      alternates: { canonical: `/blog/${post.slug}` },
-    }
+      path: `/blog/${post.slug}`,
+      type: "article",
+      keywords: post.tags ?? [],
+      image: post.featuredImage || ogImage(title, "NSH Media Services"),
+      imageAlt: title,
+    })
   } catch {
     return {}
   }
 }
 
-export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function BlogPostPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}) {
   const { slug } = await params
 
   let post: Awaited<ReturnType<typeof getPostBySlug>> | null = null
@@ -64,20 +69,32 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
   if (!post) notFound()
 
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BlogPosting',
-    headline: post.seoTitle || post.title,
-    description: post.seoDescription || post.excerpt,
-    ...(post.featuredImage && { image: post.featuredImage }),
-    author: { '@type': 'Person', name: post.author },
-    datePublished: post.createdAt instanceof Date ? post.createdAt.toISOString() : undefined,
-    url: `/blog/${post.slug}`,
-  }
+  const structuredData = [
+    blogPostingSchema({
+      title: post.seoTitle || post.title,
+      slug: post.slug,
+      excerpt: post.seoDescription || post.excerpt,
+      author: post.author,
+      image: post.featuredImage,
+      publishedAt: post.createdAt,
+      updatedAt: post.updatedAt,
+      tags: post.tags ?? [],
+      categories: post.categories ?? [],
+    }),
+    breadcrumbSchema([
+      { name: "Home", url: "/" },
+      { name: "Blog", url: "/blog" },
+      { name: post.title, url: `/blog/${post.slug}` },
+    ]),
+  ]
 
   const allPosts = await getPosts()
   const relatedPosts = ((allPosts || []) as unknown as Array<Record<string, unknown>>)
-    .filter((p) => (p.categories as string[] | undefined)?.[0] === (post.categories as string[] | undefined)?.[0] && p.slug !== slug)
+    .filter(
+      (p) =>
+        (p.categories as string[] | undefined)?.[0] ===
+          (post.categories as string[] | undefined)?.[0] && p.slug !== slug,
+    )
     .slice(0, 3)
     .map((p) => ({
       title: (p.title as string) ?? "",
@@ -105,7 +122,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <JsonLdScript schema={structuredData} />
       <BlogPostClient post={plainPost} relatedPosts={relatedPosts} />
     </>
   )

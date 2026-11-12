@@ -41,7 +41,8 @@ export default function FinalCTASection() {
             variants={fadeUp}
             className="mt-6 text-lg text-silver max-w-xl mx-auto"
           >
-            Let&apos;s build something amazing together. Get a free consultation today.
+            Tell us what you are trying to build. We will reply with honest next
+            steps and a recommended scope.
           </motion.p>
 
           <motion.div variants={fadeUp} className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -50,18 +51,18 @@ export default function FinalCTASection() {
                 size="xl"
                 className="bg-accent text-accent-foreground glow-amber hover:bg-amber-500 px-10 font-semibold"
               >
-                Get Free Consultation
+                Start a Project
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
-            <Link href="/contact">
+            <Link href="/portfolio">
               <Button
                 variant="outline"
                 size="xl"
                 className="glass text-foreground hover:bg-white/10 px-10"
               >
                 <Calendar className="mr-2 h-5 w-5" />
-                Book a Call
+                See Our Work
               </Button>
             </Link>
           </motion.div>

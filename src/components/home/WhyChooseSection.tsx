@@ -5,8 +5,8 @@ import { Users, Heart, Timer, Zap } from "lucide-react"
 
 const reasons = [
   {
-    title: "Expert Team",
-    description: "Our skilled professionals bring years of experience across design, development, and strategy.",
+    title: "Focused Expertise",
+    description: "Our work combines web design, web development, and e-commerce rather than trying to cover every digital discipline.",
     icon: Users,
   },
   {
@@ -15,13 +15,13 @@ const reasons = [
     icon: Heart,
   },
   {
-    title: "Timely Delivery",
-    description: "We respect your time with transparent timelines, regular updates, and on-time project delivery.",
+    title: "Clear Timelines",
+    description: "We agree milestones before work starts and keep you updated as the project progresses.",
     icon: Timer,
   },
   {
-    title: "Cutting-Edge Tech",
-    description: "We leverage the latest technologies and frameworks to build future-ready digital solutions.",
+    title: "Modern Build Practices",
+    description: "We use modern frameworks and established performance, accessibility, and technical SEO practices.",
     icon: Zap,
   },
 ]
@@ -49,9 +49,10 @@ export default function WhyChooseSection() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="text-section text-gradient font-heading">Why Choose NSH Media</h2>
+          <h2 className="text-section text-gradient font-heading">Why Work With NSH Media Services</h2>
           <p className="mt-4 text-lg text-silver max-w-2xl mx-auto">
-            We combine creativity with technical excellence to deliver results that matter.
+            A clear process, honest communication, and work built around your
+            business goals.
           </p>
         </motion.div>
 

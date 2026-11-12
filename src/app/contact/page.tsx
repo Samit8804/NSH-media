@@ -1,30 +1,41 @@
 import type { Metadata } from "next"
 import ContactPage from "./PageClient"
+import JsonLdScript from "@/components/seo/JsonLdScript"
+import { breadcrumbSchema, webPageSchema } from "@/lib/seo"
+import { pageMetadata } from "@/lib/metadata"
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Contact Us",
-  description: "Get in touch with NSH Media. Start your digital transformation journey with a free consultation.",
-  openGraph: {
-    title: "Contact Us | NSH Media",
-    description: "Get in touch with NSH Media. Start your digital transformation journey with a free consultation.",
-    url: "https://nshmedia.com/contact",
-    images: [{ url: "/og-default.svg", width: 1200, height: 630 }],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Contact Us | NSH Media",
-    description: "Get in touch with NSH Media. Start your digital transformation journey with a free consultation.",
-    images: ["/og-default.svg"],
-  },
-  alternates: {
-    canonical: "https://nshmedia.com/contact",
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-}
+  description:
+    "Tell us about your website, web development, or e-commerce project. Contact NSH Media Services by email or through the project enquiry form.",
+  path: "/contact",
+  keywords: [
+    "contact NSH Media Services",
+    "website project enquiry",
+    "hire web design studio",
+  ],
+})
 
 export default function Page() {
-  return <ContactPage />
+  const description =
+    "Contact NSH Media Services about a website design, web development, or e-commerce project."
+  const structuredData = [
+    webPageSchema({
+      title: "Contact NSH Media Services",
+      description,
+      path: "/contact",
+      type: "ContactPage",
+    }),
+    breadcrumbSchema([
+      { name: "Home", url: "/" },
+      { name: "Contact", url: "/contact" },
+    ]),
+  ]
+
+  return (
+    <>
+      <JsonLdScript schema={structuredData} />
+      <ContactPage />
+    </>
+  )
 }

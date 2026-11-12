@@ -52,22 +52,24 @@ export default function HeroSection() {
           >
             <motion.div variants={fadeUpSmall} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass text-xs font-medium text-silver mb-8">
               <span className="w-2 h-2 rounded-full bg-primary" />
-              Premium Digital Agency
+              NSH Media Services · Visual Solutions
             </motion.div>
 
             <motion.h1 variants={fadeUp} className="text-hero text-foreground">
-              <span className="block">A Premium Digital Agency</span>
-              <span className="block">Building Digital Experiences</span>
+              <span className="block">Web Design & Development</span>
+              <span className="block">for Growing Businesses</span>
             </motion.h1>
 
             <motion.p variants={fadeUpSmall} className="mt-6 text-lg text-silver max-w-xl leading-relaxed mx-auto lg:mx-0">
-              We craft digital products that combine stunning design with powerful technology to help your business thrive in the modern era.
+              NSH Media Services is a digital design and development studio.
+              We plan, design, and build websites, web applications, and online
+              stores that are clear, fast, and easy to manage.
             </motion.p>
 
             <motion.div variants={fadeUpSmall} className="mt-10 flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start">
               <Link href="/contact">
                 <Button size="xl" className="bg-primary text-white glow-blue hover:bg-primary-hover px-10">
-                  Get Started
+                  Start a Project
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>

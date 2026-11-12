@@ -5,31 +5,25 @@ import { getFAQs } from "@/actions/faqs"
 import { getServices } from "@/actions/services"
 import HomePage from "./PageClient"
 import type { Testimonial } from "@/components/home/TestimonialsSection"
+import JsonLdScript from "@/components/seo/JsonLdScript"
+import { faqPageSchema, webPageSchema } from "@/lib/seo"
+import { pageMetadata } from "@/lib/metadata"
+import { SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE } from "@/lib/site"
 
-export const metadata: Metadata = {
-  title: "NSH Media - Building Digital Experiences That Drive Growth",
-  description: "NSH Media is a premium digital agency delivering web development, UI/UX design, SEO optimization, branding, and AI automation services that drive growth.",
-  keywords: ["web development", "UI/UX design", "SEO", "branding", "AI automation", "digital agency"],
-  openGraph: {
-    title: "NSH Media - Building Digital Experiences That Drive Growth",
-    description: "NSH Media is a premium digital agency delivering web development, UI/UX design, SEO optimization, branding, and AI automation services that drive growth.",
-    url: "https://nshmedia.com",
-    images: [{ url: "/og-default.svg", width: 1200, height: 630 }],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "NSH Media - Building Digital Experiences That Drive Growth",
-    description: "NSH Media is a premium digital agency delivering web development, UI/UX design, SEO optimization, branding, and AI automation services that drive growth.",
-    images: ["/og-default.svg"],
-  },
-  alternates: {
-    canonical: "https://nshmedia.com",
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-}
+export const metadata: Metadata = pageMetadata({
+  title: `${SITE_NAME} — ${SITE_TAGLINE}`,
+  absoluteTitle: `${SITE_NAME} | Web Design, Web Development & E-Commerce`,
+  description: SITE_DESCRIPTION,
+  path: "/",
+  keywords: [
+    "web design services",
+    "web development services",
+    "e-commerce development",
+    "custom website design",
+    "business website development",
+    "NSH Media Services",
+  ],
+})
 
 export const dynamic = "force-dynamic"
 
@@ -76,12 +70,24 @@ export default async function Page() {
       slug: s.slug,
     }))
 
+  const structuredData = [
+    webPageSchema({
+      title: `${SITE_NAME} — ${SITE_TAGLINE}`,
+      description: SITE_DESCRIPTION,
+      path: "/",
+    }),
+    ...(jsonFaqs.length ? [faqPageSchema(jsonFaqs)] : []),
+  ]
+
   return (
-    <HomePage
-      testimonials={jsonTestimonials}
-      featuredProjects={jsonFeaturedProjects}
-      faqs={jsonFaqs}
-      services={jsonServices}
-    />
+    <>
+      <JsonLdScript schema={structuredData} />
+      <HomePage
+        testimonials={jsonTestimonials}
+        featuredProjects={jsonFeaturedProjects}
+        faqs={jsonFaqs}
+        services={jsonServices}
+      />
+    </>
   )
 }

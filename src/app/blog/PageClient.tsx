@@ -68,7 +68,8 @@ export default function BlogPage({ posts: initialPosts, categories: initialCateg
             Our{" "}<span className="text-gradient">Blog</span>
           </motion.h1>
           <motion.p initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.1 }} className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-silver">
-            Insights, strategies, and stories from our team of digital experts.
+            Practical articles about web design, web development, and
+            e-commerce for businesses.
           </motion.p>
         </div>
       </section>

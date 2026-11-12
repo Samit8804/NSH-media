@@ -7,6 +7,7 @@ import Link from "next/link"
 import type { ProjectData } from "@/data/portfolio"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
 interface PortfolioPageProps {
@@ -51,7 +52,8 @@ export default function PortfolioPage({ projects: initialProjects }: PortfolioPa
             Our{" "}<span className="text-gradient">Portfolio</span>
           </motion.h1>
           <motion.p initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.1 }} className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-silver">
-            Explore our work and see how we&apos;ve helped businesses achieve their digital goals.
+            Website design, web development, and e-commerce projects. Published
+            work appears here as projects are added.
           </motion.p>
         </div>
       </section>
@@ -76,7 +78,23 @@ export default function PortfolioPage({ projects: initialProjects }: PortfolioPa
           </motion.div>
 
           <AnimatePresence mode="wait">
-            {filtered.length > 0 ? (
+            {projects.length === 0 ? (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="py-20 text-center">
+                <p className="text-lg text-silver">No projects are published yet.</p>
+                <p className="mx-auto mt-3 max-w-xl text-silver/70">
+                  Explore the services we offer or get in touch to discuss your
+                  project.
+                </p>
+                <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+                  <Button asChild>
+                    <Link href="/services">Explore Services</Link>
+                  </Button>
+                  <Button asChild variant="outline">
+                    <Link href="/contact">Start a Project</Link>
+                  </Button>
+                </div>
+              </motion.div>
+            ) : filtered.length > 0 ? (
               <motion.div key={activeCategory + searchQuery} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }} className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
                 {filtered.map((project, index) => (
                   <motion.div key={project.slug} layout initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} transition={{ duration: 0.4 }}>
@@ -106,7 +124,7 @@ export default function PortfolioPage({ projects: initialProjects }: PortfolioPa
               </motion.div>
             ) : (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="py-20 text-center">
-                <p className="text-lg text-silver">No projects found matching your criteria.</p>
+                <p className="text-lg text-silver">No projects match your search.</p>
               </motion.div>
             )}
           </AnimatePresence>

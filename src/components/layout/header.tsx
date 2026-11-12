@@ -17,11 +17,8 @@ const navLinks: NavLink[] = [
     children: [
       { label: "Web Design", href: "/services/web-design" },
       { label: "Web Development", href: "/services/web-development" },
-      { label: "E-Commerce", href: "/services/e-commerce" },
-      { label: "SEO", href: "/services/seo" },
-      { label: "Branding", href: "/services/branding" },
-      { label: "Maintenance", href: "/services/maintenance" },
-      { label: "AI Automation", href: "/services/ai-automation" },
+      { label: "E-Commerce", href: "/services/ecommerce" },
+      { label: "All Services", href: "/services" },
     ],
   },
   { label: "Portfolio", href: "/portfolio" },
@@ -69,8 +66,20 @@ export default function Header() {
         )}
       >
         <div className="container-site flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <Image src="/images/logo.png" alt="NSH Media" width={40} height={40} className="h-10 w-10 rounded-full object-cover ring-2 ring-white/10" />
+          <Link href="/" className="flex items-center gap-2.5" aria-label="NSH Media Services home">
+            <Image
+              src="/icon-192.png"
+              alt=""
+              width={40}
+              height={40}
+              priority
+              className="h-10 w-10 rounded-full ring-2 ring-white/10"
+            />
+            <span className="hidden items-center sm:flex">
+              <span className="font-heading text-lg font-bold tracking-tight text-white">NSH</span>
+              <span className="text-primary text-lg font-bold">.</span>
+              <span className="font-heading text-lg font-bold tracking-tight text-white">MEDIA</span>
+            </span>
           </Link>
 
           <nav className="hidden items-center gap-1 lg:flex">

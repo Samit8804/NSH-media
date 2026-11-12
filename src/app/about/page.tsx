@@ -1,30 +1,41 @@
 import type { Metadata } from "next"
 import AboutPage from "./PageClient"
+import JsonLdScript from "@/components/seo/JsonLdScript"
+import { breadcrumbSchema, webPageSchema } from "@/lib/seo"
+import { pageMetadata } from "@/lib/metadata"
 
-export const metadata: Metadata = {
-  title: "About Us",
-  description: "Learn about NSH Media's mission, team, and expertise in delivering cutting-edge digital solutions for modern businesses.",
-  openGraph: {
-    title: "About Us | NSH Media",
-    description: "Learn about NSH Media's mission, team, and expertise in delivering cutting-edge digital solutions for modern businesses.",
-    url: "https://nshmedia.com/about",
-    images: [{ url: "/og-default.svg", width: 1200, height: 630 }],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "About Us | NSH Media",
-    description: "Learn about NSH Media's mission, team, and expertise in delivering cutting-edge digital solutions for modern businesses.",
-    images: ["/og-default.svg"],
-  },
-  alternates: {
-    canonical: "https://nshmedia.com/about",
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-}
+export const metadata: Metadata = pageMetadata({
+  title: "About the Studio",
+  description:
+    "Learn how NSH Media Services approaches web design, web development, and e-commerce — our mission, values, and the way we work with businesses.",
+  path: "/about",
+  keywords: [
+    "about NSH Media Services",
+    "digital design studio",
+    "web design and development team",
+  ],
+})
 
 export default function Page() {
-  return <AboutPage />
+  const description =
+    "NSH Media Services is a digital design and development studio offering web design, web development, and e-commerce services."
+  const structuredData = [
+    webPageSchema({
+      title: "About NSH Media Services",
+      description,
+      path: "/about",
+      type: "AboutPage",
+    }),
+    breadcrumbSchema([
+      { name: "Home", url: "/" },
+      { name: "About", url: "/about" },
+    ]),
+  ]
+
+  return (
+    <>
+      <JsonLdScript schema={structuredData} />
+      <AboutPage />
+    </>
+  )
 }

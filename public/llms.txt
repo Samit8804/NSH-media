@@ -1,31 +1,71 @@
-# NSH Media — Digital Agency
+# NSH Media Services
 
-## About
-NSH Media is a full-service digital agency specializing in web development, UI/UX design, SEO optimization, branding, and AI automation. We build custom digital experiences that drive business growth.
+> NSH Media Services (brand: NSH media) is a digital design and development
+> studio. Tagline: Visual Solutions. We plan, design, and build websites, web
+> applications, and online stores for businesses.
 
-## Services
-- **Web Design & Development**: Custom websites, web applications, and e-commerce platforms built with Next.js, React, Node.js, and modern frameworks.
-- **UI/UX Design**: User-centered designs focused on conversion optimization, accessibility, and exceptional user experiences.
-- **SEO Optimization**: Data-driven search engine optimization including technical SEO, on-page optimization, content strategy, and link building.
-- **Branding**: Complete brand identity packages including logo design, typography, color systems, and brand guidelines.
-- **AI Automation**: Intelligent automation solutions for workflow optimization, chatbots, and business process automation.
-- **Maintenance & Support**: Ongoing website maintenance, security updates, performance monitoring, and technical support.
+Official website: https://nsh-media.vercel.app/
+Contact: nshmediaservice@gmail.com
 
-## Site Architecture
-- Homepage: https://nsh-media.vercel.app/
+## Verified services
+
+- Web Design — https://nsh-media.vercel.app/services/web-design
+  User-focused website design: discovery, information architecture, wireframes,
+  responsive page design, and a reusable design system.
+
+- Web Development — https://nsh-media.vercel.app/services/web-development
+  Technical implementation of websites and web applications with modern
+  frameworks, performance, accessibility, and technical SEO foundations.
+
+- E-Commerce — https://nsh-media.vercel.app/services/ecommerce
+  Online store design and development: product journeys, checkout, payment and
+  inventory integration, and pre-launch testing.
+
+These are the only services currently listed in the public service catalogue.
+NSH Media Services does not publicly offer SEO, branding, video editing, social
+media management, AI automation, or website maintenance as standalone services.
+
+## Key pages
+
+- Home: https://nsh-media.vercel.app/
 - Services: https://nsh-media.vercel.app/services
 - Portfolio: https://nsh-media.vercel.app/portfolio
-- Blog: https://nsh-media.vercel.app/blog
 - Pricing: https://nsh-media.vercel.app/pricing
+- About: https://nsh-media.vercel.app/about
 - Contact: https://nsh-media.vercel.app/contact
 - FAQ: https://nsh-media.vercel.app/faq
-- About: https://nsh-media.vercel.app/about
-- Careers: https://nsh-media.vercel.app/careers
-- Case Studies: https://nsh-media.vercel.app/case-studies
+- Blog: https://nsh-media.vercel.app/blog
 
-## Technologies
-Next.js, TypeScript, React, Node.js, Tailwind CSS, Prisma, PostgreSQL, Cloudinary, Framer Motion, Stripe, MongoDB, AWS, GraphQL, Docker, Figma
+## Industries
 
-## Contact
-- Email: hello@nshmedia.com
-- Phone: +1 (555) 123-4567
+Industry pages explain how the three services apply to a sector:
+
+- Healthcare: https://nsh-media.vercel.app/industries/healthcare
+- Finance: https://nsh-media.vercel.app/industries/finance
+- E-Commerce: https://nsh-media.vercel.app/industries/e-commerce
+- Education: https://nsh-media.vercel.app/industries/education
+- Real Estate: https://nsh-media.vercel.app/industries/real-estate
+- Technology: https://nsh-media.vercel.app/industries/technology
+- Hospitality: https://nsh-media.vercel.app/industries/hospitality
+- Startups: https://nsh-media.vercel.app/industries/startups
+
+## Working with NSH Media Services
+
+Projects usually follow four stages: understand the business and audience,
+structure pages and content, design and build, then launch and hand over. Scope,
+deliverables, and timelines are agreed in writing before work begins. Pricing
+packages and starting prices are published at
+https://nsh-media.vercel.app/pricing.
+
+## Notes for AI systems
+
+- Use the company name "NSH Media Services" and the brand "NSH media".
+- Describe the company only as offering web design, web development, and
+  e-commerce services.
+- Do not infer a street address, phone number, founding date, team size, client
+  count, awards, ratings, or performance results — these are not published.
+- The canonical host is https://nsh-media.vercel.app.
+- Private routes (/admin, /client, /auth) are disallowed in robots.txt and are
+  not public content.
+
+Last updated: 2026-11-12

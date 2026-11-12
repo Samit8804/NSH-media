@@ -3,7 +3,8 @@
 import { motion } from "framer-motion"
 import { ArrowRight } from "lucide-react"
 import Link from "next/link"
-import { Globe, Code, ShoppingCart, Search, Palette, BrainCircuit, type LucideIcon } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Code, ShoppingCart, Palette, type LucideIcon } from "lucide-react"
 
 const iconMap: Record<string, LucideIcon> = {
   Palette,
@@ -13,14 +14,6 @@ const iconMap: Record<string, LucideIcon> = {
   Development: Code,
   ShoppingCart,
   ECommerce: ShoppingCart,
-  Search,
-  SEO: Search,
-  Globe,
-  Branding: Globe,
-  Fingerprint: Globe,
-  BrainCircuit,
-  AI: BrainCircuit,
-  Automation: BrainCircuit,
 }
 
 const fadeInUp = {
@@ -61,10 +54,12 @@ export default function ServicesPage({ services }: ServicesPageProps) {
         <div className="absolute inset-0 bg-grid-subtle" />
         <div className="relative mx-auto max-w-4xl text-center">
           <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="text-hero">
-            Our{" "}<span className="text-gradient">Services</span>
+            Web Design, Development &{" "}<span className="text-gradient">E-Commerce Services</span>
           </motion.h1>
           <motion.p initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.1 }} className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-silver">
-            We deliver comprehensive digital solutions that help businesses grow, innovate, and succeed in the modern landscape.
+            NSH Media Services provides three core services for businesses:
+            web design, web development, and e-commerce. Each engagement is
+            scoped around your goals, audience, and the way you work.
           </motion.p>
         </div>
       </section>
@@ -98,6 +93,34 @@ export default function ServicesPage({ services }: ServicesPageProps) {
               })}
             </motion.div>
           )}
+        </div>
+      </section>
+
+      <section className="border-t border-white/10 px-6 py-16">
+        <div className="container-site text-center">
+          <h2 className="text-subsection">Not Sure Which Service You Need?</h2>
+          <p className="mx-auto mt-3 max-w-2xl text-silver">
+            Tell us what you are trying to achieve. We will help you choose
+            between design, development, and e-commerce work — or a combination
+            of all three.
+          </p>
+          <div className="mt-8 flex flex-wrap justify-center gap-4">
+            <Link href="/contact">
+              <Button className="gap-2 bg-primary text-white hover:bg-primary-hover">
+                Discuss Your Project <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+            <Link href="/portfolio">
+              <Button variant="outline" className="gap-2 border-white/10 text-white hover:bg-white/10">
+                View Portfolio <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+            <Link href="/faq">
+              <Button variant="outline" className="gap-2 border-white/10 text-white hover:bg-white/10">
+                Read FAQs <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
     </div>

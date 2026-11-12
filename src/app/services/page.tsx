@@ -1,30 +1,26 @@
 import type { Metadata } from "next"
 import { getServices } from "@/actions/services"
 import ServicesPage from "./PageClient"
+import JsonLdScript from "@/components/seo/JsonLdScript"
+import { breadcrumbSchema, collectionPageSchema, webPageSchema } from "@/lib/seo"
+import { ogImage, pageMetadata } from "@/lib/metadata"
 
-export const metadata: Metadata = {
-  title: "Services",
-  description: "Comprehensive digital services including web development, UI/UX design, SEO, branding, and AI automation.",
-  openGraph: {
-    title: "Services | NSH Media",
-    description: "Comprehensive digital services including web development, UI/UX design, SEO, branding, and AI automation.",
-    url: "https://nshmedia.com/services",
-    images: [{ url: "/og-default.svg", width: 1200, height: 630 }],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Services | NSH Media",
-    description: "Comprehensive digital services including web development, UI/UX design, SEO, branding, and AI automation.",
-    images: ["/og-default.svg"],
-  },
-  alternates: {
-    canonical: "https://nshmedia.com/services",
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-}
+export const metadata: Metadata = pageMetadata({
+  title: "Web Design, Development & E-Commerce Services",
+  description:
+    "Explore NSH Media Services' verified services: web design, web development, and e-commerce. See what each service includes, how we work, and how to start a project.",
+  path: "/services",
+  keywords: [
+    "web design services",
+    "web development services",
+    "e-commerce development services",
+    "custom website design",
+  ],
+  image: ogImage(
+    "Web Design, Development & E-Commerce",
+    "Services from NSH Media Services",
+  ),
+})
 
 export const dynamic = "force-dynamic"
 
@@ -39,5 +35,34 @@ export default async function Page() {
     price: s.price,
   }))
 
-  return <ServicesPage services={jsonServices} />
+  const description =
+    "NSH Media Services provides web design, web development, and e-commerce services for businesses."
+  const structuredData = [
+    webPageSchema({
+      title: "Web Design, Development & E-Commerce Services",
+      description,
+      path: "/services",
+      type: "WebPage",
+    }),
+    collectionPageSchema({
+      name: "NSH Media Services",
+      description,
+      path: "/services",
+      items: jsonServices.map((service) => ({
+        name: service.title,
+        url: `/services/${service.slug}`,
+      })),
+    }),
+    breadcrumbSchema([
+      { name: "Home", url: "/" },
+      { name: "Services", url: "/services" },
+    ]),
+  ]
+
+  return (
+    <>
+      <JsonLdScript schema={structuredData} />
+      <ServicesPage services={jsonServices} />
+    </>
+  )
 }

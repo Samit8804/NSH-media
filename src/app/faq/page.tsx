@@ -1,30 +1,26 @@
 import type { Metadata } from "next"
 import { getFAQs } from "@/actions/faqs"
 import FAQPage from "./PageClient"
+import JsonLdScript from "@/components/seo/JsonLdScript"
+import {
+  breadcrumbSchema,
+  faqPageSchema,
+  webPageSchema,
+} from "@/lib/seo"
+import { pageMetadata } from "@/lib/metadata"
 
-export const metadata: Metadata = {
-  title: "FAQ",
-  description: "Frequently asked questions about our digital services, process, pricing, and how we help businesses grow online.",
-  openGraph: {
-    title: "FAQ | NSH Media",
-    description: "Frequently asked questions about our digital services, process, pricing, and how we help businesses grow online.",
-    url: "https://nshmedia.com/faq",
-    images: [{ url: "/og-default.svg", width: 1200, height: 630 }],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "FAQ | NSH Media",
-    description: "Frequently asked questions about our digital services, process, pricing, and how we help businesses grow online.",
-    images: ["/og-default.svg"],
-  },
-  alternates: {
-    canonical: "https://nshmedia.com/faq",
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-}
+export const metadata: Metadata = pageMetadata({
+  title: "Website Design & Development FAQs",
+  description:
+    "Answers to common questions about working with NSH Media Services: timelines, process, pricing, technologies, and post-launch support.",
+  path: "/faq",
+  keywords: [
+    "website design FAQ",
+    "web development questions",
+    "website project timeline",
+    "website cost FAQ",
+  ],
+})
 
 export const dynamic = "force-dynamic"
 
@@ -53,5 +49,31 @@ export default async function Page() {
     grouped[cat].push(faq)
   }
 
-  return <FAQPage faqsByCategory={grouped} categories={categories} />
+  const description =
+    "Answers to common questions about working with NSH Media Services."
+  const structuredData = [
+    webPageSchema({
+      title: "Website Design & Development FAQs",
+      description,
+      path: "/faq",
+      type: "WebPage",
+    }),
+    faqPageSchema(
+      jsonFaqs.map((faq) => ({
+        question: faq.question,
+        answer: faq.answer,
+      })),
+    ),
+    breadcrumbSchema([
+      { name: "Home", url: "/" },
+      { name: "FAQ", url: "/faq" },
+    ]),
+  ]
+
+  return (
+    <>
+      <JsonLdScript schema={structuredData} />
+      <FAQPage faqsByCategory={grouped} categories={categories} />
+    </>
+  )
 }

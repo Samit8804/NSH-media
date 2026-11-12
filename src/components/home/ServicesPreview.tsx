@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Globe, Code, ShoppingCart, Search, Palette, BrainCircuit, type LucideIcon } from "lucide-react"
+import { Code, ShoppingCart, Palette, type LucideIcon } from "lucide-react"
 import Link from "next/link"
 
 const iconMap: Record<string, LucideIcon> = {
@@ -12,14 +12,6 @@ const iconMap: Record<string, LucideIcon> = {
   Development: Code,
   ShoppingCart,
   ECommerce: ShoppingCart,
-  Search,
-  SEO: Search,
-  Globe,
-  Branding: Globe,
-  Fingerprint: Globe,
-  BrainCircuit,
-  AI: BrainCircuit,
-  Automation: BrainCircuit,
 }
 
 const containerVariants = {
@@ -82,9 +74,10 @@ export default function ServicesPage({ services }: ServicesPageProps) {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="text-section text-gradient font-heading">Our Services</h2>
+          <h2 className="text-section text-gradient font-heading">Web Design, Development & E-Commerce</h2>
           <p className="mt-4 text-lg text-silver max-w-2xl mx-auto">
-            Comprehensive digital solutions tailored to your business needs.
+            NSH Media Services focuses on three connected services: web design,
+            web development, and e-commerce.
           </p>
         </motion.div>
 
@@ -109,11 +102,8 @@ export default function ServicesPage({ services }: ServicesPageProps) {
                 <h3 className="text-xl font-heading font-semibold text-foreground mb-3">
                   {service.title}
                 </h3>
-                <p className="text-sm text-silver leading-relaxed mb-3">
+                <p className="text-sm text-silver leading-relaxed mb-5">
                   {service.description}
-                </p>
-                <p className="text-sm text-silver leading-relaxed mb-5 opacity-80">
-                  {service.fullDescription}
                 </p>
                 <Link
                   href={`/services/${service.slug}`}
@@ -126,6 +116,16 @@ export default function ServicesPage({ services }: ServicesPageProps) {
             )
           })}
         </motion.div>
+
+        <div className="mt-12 text-center">
+          <Link
+            href="/services"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-primary transition-all hover:gap-3"
+          >
+            Explore all services
+            <span aria-hidden="true">&rarr;</span>
+          </Link>
+        </div>
       </div>
     </section>
   )

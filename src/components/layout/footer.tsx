@@ -10,10 +10,8 @@ import { getPublicSettings } from "@/actions/settings"
 const services = [
   { label: "Web Design", href: "/services/web-design" },
   { label: "Web Development", href: "/services/web-development" },
-  { label: "E-Commerce", href: "/services/e-commerce" },
-  { label: "SEO", href: "/services/seo" },
-  { label: "Branding", href: "/services/branding" },
-  { label: "AI Automation", href: "/services/ai-automation" },
+  { label: "E-Commerce", href: "/services/ecommerce" },
+  { label: "All Services", href: "/services" },
 ]
 
 const company = [
@@ -83,10 +81,13 @@ export default function Footer() {
                   MEDIA
                 </span>
               </Link>
-              <p className="mt-5 max-w-xs text-sm leading-relaxed text-silver">
-                We craft digital experiences that drive growth. From web
-                development to AI automation, we help businesses thrive in the
-                digital landscape.
+              <p className="mt-2 text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+                Visual Solutions
+              </p>
+              <p className="mt-4 max-w-xs text-sm leading-relaxed text-silver">
+                We design and build websites, web applications, and online
+                stores for businesses that need a professional digital
+                presence.
               </p>
               <div className="mt-7 flex gap-2.5">
                 {socialLinks.map((social) => {
@@ -163,10 +164,11 @@ export default function Footer() {
 
             <motion.div variants={itemVariants} className="sm:col-span-2 lg:col-span-1">
               <h3 className="font-heading text-xs font-semibold uppercase tracking-widest text-white">
-                Stay Updated
+                Insights
               </h3>
               <p className="mt-3 text-sm text-silver">
-                Get the latest news and insights delivered to your inbox.
+                Practical articles about web design, development, and
+                e-commerce.
               </p>
               <div className="mt-5">
                 <Link
@@ -202,7 +204,7 @@ export default function Footer() {
         <div className="border-t border-white/5">
           <div className="container-site flex flex-col items-center justify-between gap-4 py-6 sm:flex-row">
             <p className="text-xs text-silver">
-              &copy; {currentYear} NSH Media. All rights reserved.
+              &copy; {currentYear} NSH Media Services. All rights reserved.
             </p>
             <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
               <Link

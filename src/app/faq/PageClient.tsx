@@ -32,6 +32,9 @@ export default function FAQPage({ faqsByCategory, categories }: FAQPageProps) {
 
   const tabs = categories && categories.length > 0 ? categories : ["General"]
   const currentFaqs = faqsByCategory?.[activeTab] || []
+  const quickAnswers = Object.values(faqsByCategory ?? {})
+    .flat()
+    .slice(0, 3)
 
   const filtered = search
     ? currentFaqs.filter((f) => f.question.toLowerCase().includes(search.toLowerCase()) || f.answer.toLowerCase().includes(search.toLowerCase()))
@@ -48,11 +51,34 @@ export default function FAQPage({ faqsByCategory, categories }: FAQPageProps) {
               Frequently Asked{" "}<span className="text-gradient">Questions</span>
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-silver">
-              Everything you need to know about NSH Media. Cannot find what you are looking for? Reach out to our team.
+              Common questions about working with NSH Media Services. Cannot
+              find what you are looking for? Reach out to us.
             </p>
           </motion.div>
         </div>
       </section>
+
+      {quickAnswers.length > 0 && (
+        <section className="px-6 pt-16">
+          <div className="container-site max-w-3xl">
+            <motion.div {...fadeInUp}>
+              <h2 className="text-subsection mb-6">Quick answers</h2>
+              <div className="space-y-4">
+                {quickAnswers.map((faq) => (
+                  <div key={faq.question} className="glass-card p-6">
+                    <h3 className="mb-2 font-semibold text-white">
+                      {faq.question}
+                    </h3>
+                    <p className="text-sm leading-relaxed text-silver">
+                      {faq.answer}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </section>
+      )}
 
       <section className="section-padding px-6">
         <div className="container-site max-w-3xl">
@@ -94,7 +120,7 @@ export default function FAQPage({ faqsByCategory, categories }: FAQPageProps) {
       <section className="relative overflow-hidden px-6 py-20 bg-mesh">
         <motion.div className="relative container-site max-w-xl text-center" {...fadeInUp}>
           <h2 className="text-subsection mb-4">Still Have Questions?</h2>
-          <p className="mb-8 text-lg text-silver">Our support team is ready to help. Reach out and we will get back to you within 24 hours.</p>
+          <p className="mb-8 text-lg text-silver">We are happy to help. Reach out and we will reply as soon as possible.</p>
           <Link href="/contact">
             <Button size="lg" className="gap-2 bg-primary text-white hover:bg-primary-hover">
               Contact Us <ArrowRight className="h-4 w-4" />
